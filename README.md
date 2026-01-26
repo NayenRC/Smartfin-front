@@ -58,3 +58,4 @@ VITE_API_URL=http://localhost:3000
 3. styling: Try changing the color scheme in `tailwind.config.js` or `index.css`.
 
 Happy Coding!
+# Smartfin-front
