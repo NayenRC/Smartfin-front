@@ -1,19 +1,22 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
+
 import Layout from "./layouts/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Register from "./pages/Register";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* LOGIN */}
+        {/* RUTAS PÚBLICAS */}
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        {/* APP PRIVADA */}
+        {/* RUTAS PRIVADAS */}
         <Route
           element={
             <ProtectedRoute>
@@ -25,10 +28,8 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
 
-        {/* CUALQUIER OTRA RUTA */}
-        <Route path="/register" element={<Register />} />
-
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
