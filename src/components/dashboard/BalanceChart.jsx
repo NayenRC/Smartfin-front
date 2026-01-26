@@ -25,7 +25,11 @@ const BalanceChart = ({ income, expenses }) => {
             <XAxis dataKey="name" stroke="#94a3b8" />
             <YAxis stroke="#94a3b8" />
             <Tooltip />
-            <Bar dataKey="value" fill="#2563eb" radius={[6, 6, 0, 0]} />
+            <Bar
+              dataKey="value"
+              fill="#2563eb"
+              radius={[6, 6, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
