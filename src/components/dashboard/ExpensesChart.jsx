@@ -6,11 +6,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#2563eb", "#22d3ee", "#38bdf8", "#818cf8"];
+const COLORS = ["#2563eb", "#22c55e", "#eab308", "#ef4444"];
 
 const ExpensesChart = ({ data }) => {
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-glow">
+    <div className="bg-card/80 backdrop-blur-glass border border-border rounded-xl p-6 shadow-glow">
       <h3 className="text-lg font-semibold mb-4">
         Gastos por categoría
       </h3>
@@ -23,7 +23,6 @@ const ExpensesChart = ({ data }) => {
               dataKey="amount"
               nameKey="category"
               outerRadius={90}
-              label
             >
               {data.map((_, index) => (
                 <Cell

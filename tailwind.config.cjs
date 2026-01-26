@@ -1,17 +1,20 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        bg: "#020617",
-        card: "#0f172a",
+        background: "#020617",
+        card: "#020617",
         border: "#1e293b",
         primary: "#2563eb",
-        glow: "#22d3ee",
+        primaryGlow: "#3b82f6",
       },
       boxShadow: {
-        glow: "0 0 20px rgba(34, 211, 238, 0.15)",
+        glow: "0 0 30px rgba(59,130,246,0.25)",
+      },
+      backdropBlur: {
+        glass: "12px",
       },
     },
   },

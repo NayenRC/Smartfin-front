@@ -1,105 +1,112 @@
-import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { LogOut, Home, BookOpen, Menu } from 'lucide-react';
-import Button from '../components/ui/Button';
+import React from "react";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Home, BookOpen, Menu } from "lucide-react";
 
 const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  // 🔐 Cerrar sesión
+  const handleLogout = async () => {
+    await logout();
+    navigate("/", { replace: true });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-card border-b border-border shadow-sm">
+      <header className="bg-card/80 backdrop-blur-glass border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <span className="text-xl font-bold text-white">
-                  Smart<span className="text-glow">fin</span>
-                </span>
-              </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            {/* Logo + links */}
+            <div className="flex items-center">
+              <span className="text-xl font-bold text-white mr-8">
+                Smart<span className="text-primary">fin</span>
+              </span>
+
+              <div className="hidden sm:flex space-x-6">
                 <Link
-                  to="/"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  to="/dashboard"
+                  className="flex items-center text-gray-300 hover:text-white transition"
                 >
                   <Home className="w-4 h-4 mr-2" />
                   Dashboard
                 </Link>
+
                 <Link
-                  to="/examples"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  to="/chat"
+                  className="flex items-center text-gray-300 hover:text-white transition"
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   ChatBot
                 </Link>
               </div>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <span className="text-sm text-gray-500 mr-4">
-                Hola, {user?.name || 'Usuario'}
-              </span>
-              <Button className="bg-transparent border border-border text-white hover:bg-border">
-                Salir
-              </Button>
 
-            </div>
-            <div className="-mr-2 flex items-center sm:hidden">
+            {/* User + logout */}
+            <div className="hidden sm:flex items-center space-x-4">
+              <span className="text-sm text-gray-400">
+                Hola, {user?.email || "Usuario"}
+              </span>
+
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg border border-border text-sm
+                           text-gray-200 hover:bg-primary/10 transition"
               >
-                <Menu className="w-6 h-6" />
+                Salir
               </button>
             </div>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="sm:hidden text-gray-400 hover:text-white"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="sm:hidden">
-            <div className="pt-2 pb-3 space-y-1">
-              <Link
-                to="/"
-                className="bg-blue-50 border-blue-500 text-blue-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/examples"
-                className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-              >
-                Examples
-              </Link>
-              <Button className="bg-transparent border border-border text-white hover:bg-border">
-                Logout
-              </Button>
-            </div>
+          <div className="sm:hidden border-t border-border px-4 py-4 space-y-3">
+            <Link
+              to="/dashboard"
+              onClick={() => setIsMenuOpen(false)}
+              className="block text-gray-300 hover:text-white"
+            >
+              Dashboard
+            </Link>
+
+            <Link
+              to="/chat"
+              onClick={() => setIsMenuOpen(false)}
+              className="block text-gray-300 hover:text-white"
+            >
+              ChatBot
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="w-full text-left text-red-400 hover:text-red-300"
+            >
+              Salir
+            </button>
           </div>
         )}
       </header>
 
-      {/* Main Content */}
+      {/* Main content */}
       <main className="flex-1">
         <Outlet />
       </main>
 
-
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-gray-500">
-            © 2024 Student Project Example. Built with React & Vite.
-          </p>
-        </div>
+      <footer className="border-t border-border py-4 text-center text-sm text-gray-500">
+        © 2024 Smartfin. Proyecto académico.
       </footer>
     </div>
   );
