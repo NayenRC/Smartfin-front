@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "../services/supabaseClient";
+import api from "../services/api";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
@@ -19,17 +19,14 @@ const ForgotPassword = () => {
         setError("");
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`,
-            });
-
-            if (error) throw error;
+            const response = await api.post("/auth/forgot-password", { email });
 
             showSuccess("Enlace de recuperación enviado.");
-            setMessage("Se ha enviado un enlace de recuperación a tu correo.");
+            setMessage(response.data.message || "Se ha enviado un enlace de recuperación a tu correo.");
         } catch (err) {
-            showError(err.message || "Error al enviar el correo de recuperación.");
-            setError(err.message || "Error al enviar el correo de recuperación.");
+            const errorMsg = err.response?.data?.message || "Error al enviar el correo de recuperación.";
+            showError(errorMsg);
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }

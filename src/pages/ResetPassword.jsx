@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../services/supabaseClient";
+import { useNavigate, useLocation } from "react-router-dom";
+import api from "../services/api";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
@@ -13,84 +13,72 @@ const ResetPassword = () => {
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // El token vendrá en la URL como /reset-password?token=XYZ
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get("token");
 
     useEffect(() => {
-        // Verificar sesión y tokens en la URL
-        const checkSession = async () => {
-            console.log("🔍 Verificando sesión para reset...");
+        if (!token) {
+            showError("No se encontró un token de recuperación.");
+            setError("Enlace inválido. Por favor solicita uno nuevo.");
+            return;
+        }
 
-            // 1. Obtener sesión actual
-            const { data, error: sessionError } = await supabase.auth.getSession();
-
-            if (sessionError) {
-                console.error("❌ Error de sesión:", sessionError);
-                showError("Error al verificar la sesión.");
-                return;
-            }
-
-            if (data.session) {
-                console.log("✅ Sesión detectada:", data.session.user.email);
-            } else {
-                console.warn("⚠️ No se detectó sesión activa.");
-
-                // Si no hay sesión, verificamos si hay tokens en la URL (algunos navegadores limpian el hash rápido)
-                const hasHash = window.location.hash.includes('access_token');
-                if (!hasHash) {
-                    showError("El enlace de recuperación parece inválido o ha expirado.");
-                    setError("El enlace de recuperación es inválido o expiró. Por favor solicita uno nuevo.");
+        const verifyToken = async () => {
+            try {
+                const response = await api.get(`/ auth / verify - reset - token / ${token} `);
+                if (!response.data.valid) {
+                    setError("El enlace ha expirado o es inválido.");
                 }
+            } catch (err) {
+                setError("Error al verificar el enlace de recuperación.");
             }
         };
 
-        checkSession();
-
-        // Escuchar cambios de auth por si el hash se procesa después
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            console.log("🔔 Auth Event:", event);
-            if (event === "PASSWORD_RECOVERY") {
-                console.log("🎯 Modo recuperación de contraseña activado");
-                setError(""); // Limpiar errores previos si entramos en modo recovery
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
+        verifyToken();
+    }, [token]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!token) {
+            showError("Token perdido. Por favor solicita uno nuevo.");
+            return;
+        }
+
         setLoading(true);
         setMessage("");
         setError("");
 
         if (password !== confirmPassword) {
             showError("Las contraseñas no coinciden.");
-            setError("Las contraseñas no coinciden.");
             setLoading(false);
             return;
         }
 
         if (password.length < 6) {
             showError("La contraseña debe tener al menos 6 caracteres.");
-            setError("La contraseña debe tener al menos 6 caracteres.");
             setLoading(false);
             return;
         }
 
         try {
-            const { error } = await supabase.auth.updateUser({
-                password: password,
+            const response = await api.post("/auth/reset-password", {
+                token,
+                newPassword: password,
             });
 
-            if (error) throw error;
-
             showSuccess("Contraseña actualizada exitosamente.");
-            setMessage("Contraseña actualizada exitosamente. Redirigiendo...");
+            setMessage(response.data.message || "Éxito. Redirigiendo...");
             setTimeout(() => {
                 navigate("/");
             }, 2000);
         } catch (err) {
-            showError(err.message || "Error al actualizar la contraseña.");
-            setError(err.message || "Error al actualizar la contraseña.");
+            const errorMsg = err.response?.data?.message || "Error al actualizar la contraseña.";
+            showError(errorMsg);
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }

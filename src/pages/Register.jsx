@@ -8,8 +8,10 @@ import { showError } from "../utils/toast";
 
 
 const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { register, user } = useAuth();
@@ -27,7 +29,7 @@ const Register = () => {
     setError("");
     setLoading(true);
 
-    const result = await register(email, password);
+    const result = await register(email, password, name);
 
     if (result.success) {
       // 🔄 FLUJO CAMBIADO: Redirigir a Login en lugar de Chat
@@ -59,6 +61,16 @@ const Register = () => {
 
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
+              id="name"
+              label="Nombre Completo"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Tu nombre"
+              required
+            />
+
             <Input
               id="email"
               label="Correo Electrónico"

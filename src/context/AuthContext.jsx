@@ -1,112 +1,104 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../services/supabaseClient";
+import api from "../services/api";
 
 /**
- * Creamos el contexto de autenticación.
- * Lo inicializamos en null para poder detectar usos incorrectos.
+ * Contexto de autenticación unificado con el Backend de Railway
  */
 const AuthContext = createContext(null);
 
-/**
- * AuthProvider
- * Este componente envuelve TODA la aplicación (en main.jsx)
- * y expone el estado de autenticación y las acciones.
- */
 export const AuthProvider = ({ children }) => {
-  // Usuario autenticado (objeto user de Supabase)
   const [user, setUser] = useState(null);
-
-  // Sesión completa de Supabase (incluye access_token)
-  const [session, setSession] = useState(null);
-
-  // Estado de carga inicial (para saber si Supabase ya respondió)
   const [loading, setLoading] = useState(true);
 
   /**
-   * useEffect de inicialización
-   * 1. Obtiene la sesión actual al cargar la app
-   * 2. Escucha cambios de autenticación (login / logout)
+   * Inicialización: Recuperar token de localStorage y validar perfil
    */
   useEffect(() => {
-    // Obtener sesión inicial
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+    const initAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+      const savedUser = localStorage.getItem("auth_user");
 
-    // Listener de cambios de auth
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      if (token && savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+          // Opcional: Validar token con /auth/profile
+          api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        } catch (e) {
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("auth_user");
+        }
       }
-    );
-
-    // Cleanup del listener
-    return () => {
-      listener.subscription.unsubscribe();
+      setLoading(false);
     };
+
+    initAuth();
   }, []);
 
   /**
-   * 🔑 LOGIN
-   * Inicia sesión con email y password usando Supabase
+   * 🔑 LOGIN (vía Backend)
    */
   const login = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const response = await api.post("/auth/login", { email, password });
+      const { token, user: userData } = response.data;
 
-    if (error) {
-      return { success: false, message: error.message };
+      localStorage.setItem("auth_token", token);
+      localStorage.setItem("auth_user", JSON.stringify(userData));
+
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      setUser(userData);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error al iniciar sesión"
+      };
     }
-
-    return { success: true };
   };
 
   /**
-   * 📝 REGISTER
-   * Registra un nuevo usuario
+   * 📝 REGISTER (vía Backend)
    */
-  const register = async (email, password) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+  const register = async (email, password, name = "") => {
+    try {
+      // Nota: El backend espera 'name' (nombre en la DB)
+      const response = await api.post("/auth/register", {
+        email,
+        password,
+        name: name || email.split('@')[0]
+      });
 
-    if (error) {
-      return { success: false, message: error.message };
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error al registrarse"
+      };
     }
-
-    return { success: true };
   };
 
   /**
    * 🚪 LOGOUT
-   * Cierra sesión y limpia estados locales
    */
   const logout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
+    delete api.defaults.headers.common["Authorization"];
     setUser(null);
-    setSession(null);
   };
 
   /**
    * 🔐 getToken
-   * Devuelve el access_token para llamadas al backend
    */
   const getToken = async () => {
-    const { data } = await supabase.auth.getSession();
-    return data.session?.access_token;
+    return localStorage.getItem("auth_token");
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
         login,
         register,
         logout,
@@ -115,26 +107,15 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!user,
       }}
     >
-      {/* 
-        ❗ IMPORTANTE:
-        NO bloqueamos el render con loading.
-        El control de loading se hace en rutas o pantallas.
-      */}
       {children}
     </AuthContext.Provider>
   );
 };
 
-/**
- * Hook personalizado para consumir el AuthContext
- * Protege contra usos fuera del AuthProvider
- */
 export const useAuth = () => {
   const context = useContext(AuthContext);
-
   if (!context) {
     throw new Error("useAuth debe usarse dentro de AuthProvider");
   }
-
   return context;
 };
