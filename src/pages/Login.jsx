@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
+import { showSuccess, showError } from "../utils/toast";
 
 
 const Login = () => {
@@ -20,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     // Mostrar mensaje si viene de registro
     if (location.state?.message) {
-      setMessage(location.state.message);
+      showSuccess(location.state.message);
       // Limpiar el estado para que no aparezca al recargar
       window.history.replaceState({}, document.title);
     }
@@ -33,7 +34,7 @@ const Login = () => {
    */
   useEffect(() => {
     if (user) {
-      navigate("/chat");
+      navigate("/telegram");
     }
   }, [user, navigate]);
 
@@ -49,8 +50,10 @@ const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      navigate("/chat");
+      showSuccess("¡Bienvenido de nuevo!");
+      navigate("/telegram");
     } else {
+      showError(result.message);
       setError(result.message);
     }
 

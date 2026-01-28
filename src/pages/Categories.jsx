@@ -5,6 +5,7 @@ import CategoryForm from '../components/categories/CategoryForm';
 import Button from '../components/ui/Button';
 import categoryService from '../services/categoryService';
 import { useAuth } from '../context/AuthContext';
+import { showSuccess, showError } from '../utils/toast';
 
 export default function Categories() {
     const { getToken } = useAuth();
@@ -44,7 +45,9 @@ export default function Categories() {
             // Actualizamos estado con la respuesta del backend
             setCategories([...categories, newHelper]);
             setShowForm(false);
+            showSuccess("Categoría creada exitosamente.");
         } catch (err) {
+            showError("Error al crear la categoría.");
             setError("Error al crear la categoría.");
         }
     };
@@ -59,7 +62,9 @@ export default function Categories() {
             ));
             setEditingCategory(null);
             setShowForm(false);
+            showSuccess("Categoría actualizada.");
         } catch (err) {
+            showError("Error al actualizar la categoría.");
             setError("Error al actualizar la categoría.");
         }
     };
@@ -72,7 +77,9 @@ export default function Categories() {
             await categoryService.deleteCategory(id, token);
 
             setCategories(categories.filter(c => (c.id || c._id) !== id));
+            showSuccess("Categoría eliminada.");
         } catch (err) {
+            showError("Error al eliminar la categoría.");
             setError("Error al eliminar la categoría.");
         }
     };

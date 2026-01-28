@@ -4,6 +4,7 @@ import { supabase } from "../services/supabaseClient";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
+import { showSuccess, showError } from "../utils/toast";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -24,8 +25,10 @@ const ForgotPassword = () => {
 
             if (error) throw error;
 
+            showSuccess("Enlace de recuperación enviado.");
             setMessage("Se ha enviado un enlace de recuperación a tu correo.");
         } catch (err) {
+            showError(err.message || "Error al enviar el correo de recuperación.");
             setError(err.message || "Error al enviar el correo de recuperación.");
         } finally {
             setLoading(false);

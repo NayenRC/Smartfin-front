@@ -4,6 +4,7 @@ import { supabase } from "../services/supabaseClient";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
+import { showSuccess, showError } from "../utils/toast";
 
 const ResetPassword = () => {
     const [password, setPassword] = useState("");
@@ -18,6 +19,7 @@ const ResetPassword = () => {
         const checkSession = async () => {
             const { data } = await supabase.auth.getSession();
             if (!data.session) {
+                showError("Enlace de recuperación inválido o expirado.");
                 setError("Enlace de recuperación inválido o expirado.");
             }
         };
@@ -31,12 +33,14 @@ const ResetPassword = () => {
         setError("");
 
         if (password !== confirmPassword) {
+            showError("Las contraseñas no coinciden.");
             setError("Las contraseñas no coinciden.");
             setLoading(false);
             return;
         }
 
         if (password.length < 6) {
+            showError("La contraseña debe tener al menos 6 caracteres.");
             setError("La contraseña debe tener al menos 6 caracteres.");
             setLoading(false);
             return;
@@ -49,11 +53,13 @@ const ResetPassword = () => {
 
             if (error) throw error;
 
+            showSuccess("Contraseña actualizada exitosamente.");
             setMessage("Contraseña actualizada exitosamente. Redirigiendo...");
             setTimeout(() => {
                 navigate("/");
             }, 2000);
         } catch (err) {
+            showError(err.message || "Error al actualizar la contraseña.");
             setError(err.message || "Error al actualizar la contraseña.");
         } finally {
             setLoading(false);

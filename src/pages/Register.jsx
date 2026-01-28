@@ -4,11 +4,12 @@ import { useAuth } from "../context/AuthContext";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
+import { showError } from "../utils/toast";
+
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { register, user } = useAuth();
@@ -34,6 +35,7 @@ const Register = () => {
         state: { message: "Cuenta creada exitosamente. Por favor inicia sesión." }
       });
     } else {
+      showError(result.message);
       setError(result.message);
     }
 
