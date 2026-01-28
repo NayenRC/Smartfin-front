@@ -16,10 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     async function loadData() {
       try {
-        const token = await getToken();
-        if (!token) return;
-
-        const summary = await getDashboardSummary(token);
+        const summary = await getDashboardSummary();
         setData(summary);
       } catch (error) {
         console.error("Error loading dashboard:", error);

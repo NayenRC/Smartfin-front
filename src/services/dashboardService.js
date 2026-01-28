@@ -1,16 +1,6 @@
-export async function getDashboardSummary(token) {
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/dashboard/summary`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+import api from "./api";
 
-  if (!res.ok) {
-    throw new Error("Error al cargar dashboard");
-  }
-
-  return res.json();
+export async function getDashboardSummary() {
+  const response = await api.get("/dashboard/summary");
+  return response.data;
 }

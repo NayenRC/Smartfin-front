@@ -20,8 +20,7 @@ const Chat = () => {
     setMessages((prev) => [...prev, { role: "user", content: text }]);
 
     try {
-      const token = await getToken();
-      const data = await sendMessageToBot(text, token);
+      const data = await sendMessageToBot(text);
 
       setMessages((prev) => [
         ...prev,

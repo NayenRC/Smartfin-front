@@ -16,7 +16,7 @@ export default function CategoryList({ categories, onEdit, onDelete }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((category) => (
                 <div
-                    key={category.id || category._id}
+                    key={category.id_categoria || category.id || category._id}
                     className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center transition-shadow hover:shadow-md"
                 >
                     <div className="flex items-center space-x-3">
@@ -24,10 +24,10 @@ export default function CategoryList({ categories, onEdit, onDelete }) {
                             className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                             style={{ backgroundColor: category.color || '#cbd5e1' }}
                         >
-                            {category.name.charAt(0).toUpperCase()}
+                            {(category.name || category.nombre || '?').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <h4 className="font-semibold text-gray-800">{category.name}</h4>
+                            <h4 className="font-semibold text-gray-800">{category.name || category.nombre}</h4>
                             <div className="flex items-center text-xs text-gray-500">
                                 {category.type === 'income' ? (
                                     <>

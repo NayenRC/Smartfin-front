@@ -28,7 +28,7 @@ const ResetPassword = () => {
 
         const verifyToken = async () => {
             try {
-                const response = await api.get(`/ auth / verify - reset - token / ${token} `);
+                const response = await api.get(`/auth/verify-reset-token/${token}`);
                 if (!response.data.valid) {
                     setError("El enlace ha expirado o es inválido.");
                 }

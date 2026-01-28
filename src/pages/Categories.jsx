@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { showSuccess, showError } from '../utils/toast';
 
 export default function Categories() {
-    const { getToken } = useAuth();
+    const { user } = useAuth();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -19,14 +19,10 @@ export default function Categories() {
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const token = await getToken();
-            if (!token) return;
-
-            const data = await categoryService.getCategories(token);
+            const data = await categoryService.getCategories();
             setCategories(data);
         } catch (err) {
             console.error("Error fetching categories:", err);
-            // Mantenemos un array vacío o mostramos error, pero ya es real
             setError("No se pudieron cargar las categorías.");
         } finally {
             setLoading(false);
@@ -39,8 +35,7 @@ export default function Categories() {
 
     const handleCreate = async (formData) => {
         try {
-            const token = await getToken();
-            const newHelper = await categoryService.createCategory(formData, token);
+            const newHelper = await categoryService.createCategory(formData);
 
             // Actualizamos estado con la respuesta del backend
             setCategories([...categories, newHelper]);
@@ -54,11 +49,11 @@ export default function Categories() {
 
     const handleUpdate = async (formData) => {
         try {
-            const token = await getToken();
-            const updatedCat = await categoryService.updateCategory(editingCategory.id || editingCategory._id, formData, token);
+            const id = editingCategory.id_categoria || editingCategory.id || editingCategory._id;
+            const updatedCat = await categoryService.updateCategory(id, formData);
 
             setCategories(categories.map(c =>
-                (c.id === updatedCat.id || c._id === updatedCat._id) ? updatedCat : c
+                (c.id_categoria === updatedCat.id_categoria) ? updatedCat : c
             ));
             setEditingCategory(null);
             setShowForm(false);
@@ -72,11 +67,10 @@ export default function Categories() {
     const handleDelete = async (category) => {
         if (!window.confirm(`¿Estás seguro de eliminar "${category.name}"?`)) return;
         try {
-            const token = await getToken();
-            const id = category.id || category._id;
-            await categoryService.deleteCategory(id, token);
+            const id = category.id_categoria || category.id || category._id;
+            await categoryService.deleteCategory(id);
 
-            setCategories(categories.filter(c => (c.id || c._id) !== id));
+            setCategories(categories.filter(c => (c.id_categoria || c.id || c._id) !== id));
             showSuccess("Categoría eliminada.");
         } catch (err) {
             showError("Error al eliminar la categoría.");

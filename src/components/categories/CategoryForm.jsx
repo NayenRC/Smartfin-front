@@ -79,29 +79,6 @@ export default function CategoryForm({
                 </div>
             </div>
 
-            <div className="space-y-1">
-                <label htmlFor="color" className="block text-sm font-medium text-gray-700">
-                    Color (Hex)
-                </label>
-                <div className="flex items-center space-x-2">
-                    <input
-                        type="color"
-                        id="color"
-                        name="color"
-                        value={formData.color}
-                        onChange={handleChange}
-                        className="h-9 w-16 p-1 rounded-md border border-gray-300 cursor-pointer"
-                    />
-                    <Input
-                        id="color-text"
-                        value={formData.color}
-                        onChange={(e) => handleChange({ target: { name: 'color', value: e.target.value } })}
-                        placeholder="#000000"
-                        className="flex-1"
-                    />
-                </div>
-            </div>
-
             <div className="flex justify-end space-x-3 pt-4">
                 <Button
                     type="button"
