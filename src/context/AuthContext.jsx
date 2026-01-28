@@ -39,7 +39,9 @@ export const AuthProvider = ({ children }) => {
    */
   const login = async (email, password) => {
     try {
+      console.log("🔐 Intentando login con:", email);
       const response = await api.post("/auth/login", { email, password });
+      console.log("✅ Login exitoso:", response.data);
       const { token, user: userData } = response.data;
 
       localStorage.setItem("auth_token", token);
@@ -50,6 +52,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (error) {
+      console.error("❌ ERROR LOGIN:", error.response?.data || error.message);
       return {
         success: false,
         message: error.response?.data?.message || "Error al iniciar sesión"
@@ -62,6 +65,7 @@ export const AuthProvider = ({ children }) => {
    */
   const register = async (email, password, name = "") => {
     try {
+      console.log("📝 Intentando registro:", { email, name });
       // Nota: El backend espera 'name' (nombre en la DB)
       const response = await api.post("/auth/register", {
         email,
@@ -69,8 +73,10 @@ export const AuthProvider = ({ children }) => {
         name: name || email.split('@')[0]
       });
 
+      console.log("✅ Registro exitoso:", response.data);
       return { success: true, message: response.data.message };
     } catch (error) {
+      console.error("❌ ERROR REGISTRO:", error.response?.data || error.message);
       return {
         success: false,
         message: error.response?.data?.message || "Error al registrarse"

@@ -1,6 +1,7 @@
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
@@ -14,7 +15,7 @@ const BalanceChart = ({ income, expenses }) => {
   ];
 
   return (
-    <div className="bg-card/80 backdrop-blur-glass border border-border rounded-xl p-6 shadow-glow">
+    <div className="bg-card/50 backdrop-blur-glass border border-border rounded-2xl p-6 shadow-sm">
       <h3 className="text-lg font-semibold mb-4">
         Ingresos vs Gastos
       </h3>
@@ -27,9 +28,15 @@ const BalanceChart = ({ income, expenses }) => {
             <Tooltip />
             <Bar
               dataKey="value"
-              fill="#2563eb"
               radius={[6, 6, 0, 0]}
-            />
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.name === "Ingresos" ? "#00ff9c" : "#8b5cf6"}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
