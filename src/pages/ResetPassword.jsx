@@ -15,15 +15,45 @@ const ResetPassword = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Verificar si hay sesión de reset (Supabase maneja esto automáticamente)
+        // Verificar sesión y tokens en la URL
         const checkSession = async () => {
-            const { data } = await supabase.auth.getSession();
-            if (!data.session) {
-                showError("Enlace de recuperación inválido o expirado.");
-                setError("Enlace de recuperación inválido o expirado.");
+            console.log("🔍 Verificando sesión para reset...");
+
+            // 1. Obtener sesión actual
+            const { data, error: sessionError } = await supabase.auth.getSession();
+
+            if (sessionError) {
+                console.error("❌ Error de sesión:", sessionError);
+                showError("Error al verificar la sesión.");
+                return;
+            }
+
+            if (data.session) {
+                console.log("✅ Sesión detectada:", data.session.user.email);
+            } else {
+                console.warn("⚠️ No se detectó sesión activa.");
+
+                // Si no hay sesión, verificamos si hay tokens en la URL (algunos navegadores limpian el hash rápido)
+                const hasHash = window.location.hash.includes('access_token');
+                if (!hasHash) {
+                    showError("El enlace de recuperación parece inválido o ha expirado.");
+                    setError("El enlace de recuperación es inválido o expiró. Por favor solicita uno nuevo.");
+                }
             }
         };
+
         checkSession();
+
+        // Escuchar cambios de auth por si el hash se procesa después
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log("🔔 Auth Event:", event);
+            if (event === "PASSWORD_RECOVERY") {
+                console.log("🎯 Modo recuperación de contraseña activado");
+                setError(""); // Limpiar errores previos si entramos en modo recovery
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const handleSubmit = async (e) => {
