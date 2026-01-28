@@ -6,8 +6,7 @@ export async function sendMessageToBot(message, token) {
       Authorization: token ? `Bearer ${token}` : undefined,
     },
     body: JSON.stringify({
-      message,
-      source: "chat", // 👈 importante para backend
+      mensaje: message, // Backend expects 'mensaje'
     }),
   });
 

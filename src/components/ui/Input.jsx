@@ -24,12 +24,12 @@ const Input = ({
       <input
         id={id}
         type={type}
-        value={value}              
-        onChange={onChange}        
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 bg-white"
       />
     </div>
   );

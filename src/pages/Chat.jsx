@@ -27,7 +27,7 @@ const Chat = () => {
         ...prev,
         {
           role: "assistant",
-          content: data.reply || "Mensaje procesado ✅",
+          content: data.response || "Mensaje procesado ✅",
         },
       ]);
     } catch {
@@ -43,9 +43,14 @@ const Chat = () => {
 
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)]">
-      <ChatWindow messages={messages} />
-      <ChatInput onSend={handleSend} />
+    <div className="flex flex-col h-[calc(100vh-64px)] bg-background relative">
+      {/* Glow effect */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neon-purple/5 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col flex-1">
+        <ChatWindow messages={messages} />
+        <ChatInput onSend={handleSend} />
+      </div>
     </div>
   );
 };

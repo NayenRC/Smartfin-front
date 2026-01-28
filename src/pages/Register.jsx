@@ -29,7 +29,10 @@ const Register = () => {
     const result = await register(email, password);
 
     if (result.success) {
-      navigate("/chat");
+      // 🔄 FLUJO CAMBIADO: Redirigir a Login en lugar de Chat
+      navigate("/", {
+        state: { message: "Cuenta creada exitosamente. Por favor inicia sesión." }
+      });
     } else {
       setError(result.message);
     }
@@ -38,14 +41,17 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-md w-full space-y-8 relative z-10 px-4">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Crear cuenta
+          <h2 className="text-4xl font-extrabold text-white">
+            Crear cuenta en <span className="text-neon-green">Smart</span><span className="text-neon-purple">fin</span>
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Regístrate para comenzar a usar Smartfin
+          <p className="mt-2 text-sm text-gray-400">
+            Regístrate para comenzar a usar tu asistente financiero
           </p>
         </div>
 
@@ -53,17 +59,17 @@ const Register = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <Input
               id="email"
-              label="Email Address"
+              label="Correo Electrónico"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="student@example.com"
+              placeholder="usuario@ejemplo.com"
               required
             />
 
             <Input
               id="password"
-              label="Password"
+              label="Contraseña"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -72,26 +78,26 @@ const Register = () => {
             />
 
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="bg-red-500/10 border border-red-500/50 p-4 rounded-lg">
+                <p className="text-sm text-red-400">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
               variant="primary"
-              className="w-full flex justify-center"
+              className="w-full flex justify-center py-3 bg-gradient-to-r from-neon-green to-neon-purple hover:opacity-90 transition-opacity border-none text-black font-bold"
               disabled={loading}
             >
               {loading ? "Creando cuenta..." : "Registrarse"}
             </Button>
 
             <div className="text-sm text-center">
-              <p className="text-gray-500">
+              <p className="text-gray-400">
                 ¿Ya tienes cuenta?{" "}
                 <Link
                   to="/"
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-neon-green hover:text-neon-purple transition-colors font-medium"
                 >
                   Inicia sesión
                 </Link>
