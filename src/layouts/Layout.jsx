@@ -52,13 +52,15 @@ const Layout = () => {
                   Categorías
                 </Link>
 
-                <Link
-                  to="/chat"
+                <a
+                  href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME || 'Smartfin27_bot'}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center text-sm font-medium text-gray-400 hover:text-blue-400 transition-colors"
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   SmartChat
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -114,13 +116,15 @@ const Layout = () => {
               Categorías
             </Link>
 
-            <Link
-              to="/chat"
+            <a
+              href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME || 'Smartfin27_bot'}`}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setIsMenuOpen(false)}
               className="block text-base font-medium text-gray-300 hover:text-blue-400"
             >
               SmartChat
-            </Link>
+            </a>
 
             <div className="border-t border-gray-800 my-2 pt-2">
               <button

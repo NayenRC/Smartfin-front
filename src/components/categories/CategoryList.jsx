@@ -29,7 +29,7 @@ export default function CategoryList({ categories, onEdit, onDelete }) {
                         <div>
                             <h4 className="font-semibold text-gray-800">{category.name || category.nombre}</h4>
                             <div className="flex items-center text-xs text-gray-500">
-                                {category.type === 'income' ? (
+                                {(category.type === 'income' || category.tipo === 'INGRESO') ? (
                                     <>
                                         <ArrowUpCircle className="w-3 h-3 text-green-500 mr-1" />
                                         <span>Ingreso</span>

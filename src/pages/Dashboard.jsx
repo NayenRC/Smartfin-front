@@ -56,13 +56,15 @@ const Dashboard = () => {
           <p className="text-gray-400 mt-1">Este es el estado actual de tus finanzas</p>
         </div>
 
-        <Link
-          to="/chat"
+        <a
+          href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME || 'Smartfin27_bot'}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center px-6 py-3 bg-neon-green/10 text-neon-green border border-neon-green/20 rounded-full hover:bg-neon-green/20 transition-all group font-medium"
         >
           <span className="mr-2">Hablar con SmartBot</span>
           <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
+        </a>
       </div>
 
       {/* DVDs / KPIs */}

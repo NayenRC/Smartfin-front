@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import { ExternalLink, MessageCircle } from "lucide-react";
 import Card from "../components/ui/Card";
 
@@ -62,6 +63,15 @@ const TelegramRedirect = () => {
                                 <span>Abrir SmartFin Bot</span>
                                 <ExternalLink className="w-4 h-4" />
                             </a>
+                        </div>
+
+                        <div className="pt-2">
+                            <Link
+                                to="/dashboard"
+                                className="text-gray-400 hover:text-white transition-colors text-sm underline underline-offset-4"
+                            >
+                                Volver al Dashboard
+                            </Link>
                         </div>
 
                         <div className="text-xs text-gray-500 pt-4">

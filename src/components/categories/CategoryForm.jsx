@@ -17,8 +17,8 @@ export default function CategoryForm({
     useEffect(() => {
         if (initialData) {
             setFormData({
-                name: initialData.name || '',
-                type: initialData.type || 'expense',
+                name: initialData.name || initialData.nombre || '',
+                type: (initialData.type === 'income' || initialData.tipo === 'INGRESO') ? 'income' : 'expense',
                 color: initialData.color || '#3b82f6',
             });
         }

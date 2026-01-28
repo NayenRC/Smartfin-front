@@ -6,11 +6,10 @@ const getCategories = async () => {
 };
 
 const createCategory = async (categoryData) => {
-    // Mapeo: name -> nombre, type -> tipo
+    // Mapeo: name -> nombre, type -> tipo (GASTO/INGRESO)
     const payload = {
         nombre: categoryData.name,
-        tipo: categoryData.type,
-        color: categoryData.color
+        tipo: categoryData.type === "expense" ? "GASTO" : "INGRESO"
     };
     const { data } = await api.post("/categorias", payload);
     return data;
@@ -19,8 +18,7 @@ const createCategory = async (categoryData) => {
 const updateCategory = async (id, categoryData) => {
     const payload = {
         nombre: categoryData.name,
-        tipo: categoryData.type,
-        color: categoryData.color
+        tipo: categoryData.type === "expense" ? "GASTO" : "INGRESO"
     };
     const { data } = await api.put(`/categorias/${id}`, payload);
     return data;
