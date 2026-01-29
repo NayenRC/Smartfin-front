@@ -9,11 +9,6 @@ import api from '../../src/services/api';
 vi.mock('../../src/services/api', () => ({
     default: {
         post: vi.fn(),
-        defaults: {
-            headers: {
-                common: {}
-            }
-        }
     }
 }));
 

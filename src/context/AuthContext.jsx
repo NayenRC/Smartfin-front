@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
       if (token && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
-          api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         } catch (e) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
@@ -52,7 +51,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
 
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setUser(userData);
 
       return { success: true };
@@ -104,7 +102,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    delete api.defaults.headers.common["Authorization"];
     setUser(null);
   };
 

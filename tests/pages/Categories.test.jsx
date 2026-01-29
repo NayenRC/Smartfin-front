@@ -12,11 +12,6 @@ vi.mock('../../src/services/api', () => ({
         post: vi.fn(),
         put: vi.fn(),
         delete: vi.fn(),
-        defaults: {
-            headers: {
-                common: {}
-            }
-        }
     }
 }));
 

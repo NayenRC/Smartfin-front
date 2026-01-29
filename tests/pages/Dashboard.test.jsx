@@ -17,11 +17,6 @@ vi.mock('../../src/components/dashboard/BalanceChart', () => ({
 vi.mock('../../src/services/api', () => ({
     default: {
         get: vi.fn(),
-        defaults: {
-            headers: {
-                common: {}
-            }
-        }
     }
 }));
 

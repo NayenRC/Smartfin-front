@@ -7,11 +7,6 @@ import api from '../../src/services/api';
 vi.mock('../../src/services/api', () => ({
     default: {
         post: vi.fn(),
-        defaults: {
-            headers: {
-                common: {}
-            }
-        }
     }
 }));
 
@@ -31,7 +26,6 @@ describe('AuthContext', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
-        delete api.defaults.headers.common['Authorization'];
     });
 
     it('initializes with null user if no storage', async () => {
@@ -50,7 +44,6 @@ describe('AuthContext', () => {
         });
 
         expect(screen.getByTestId('user')).toHaveTextContent('Persisted');
-        expect(api.defaults.headers.common['Authorization']).toBe('Bearer token123');
     });
 
     it('handles invalid JSON in localStorage gracefully', async () => {
