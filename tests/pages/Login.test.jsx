@@ -69,7 +69,7 @@ describe('Login Page', () => {
         });
 
         // Debería guardar en localStorage (AuthContext lo hace)
-        expect(localStorage.getItem('auth_token')).toBe('fake-token');
+        expect(localStorage.getItem('token')).toBe('fake-token');
     });
 
     it('displays error message on failed login', async () => {

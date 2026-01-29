@@ -42,8 +42,8 @@ describe('AuthContext', () => {
     });
 
     it('recovers user from localStorage on init', async () => {
-        localStorage.setItem('auth_token', 'token123');
-        localStorage.setItem('auth_user', JSON.stringify({ nombre: 'Persisted' }));
+        localStorage.setItem('token', 'token123');
+        localStorage.setItem('user', JSON.stringify({ nombre: 'Persisted' }));
 
         await act(async () => {
             render(<AuthProvider><TestComponent /></AuthProvider>);
@@ -54,20 +54,20 @@ describe('AuthContext', () => {
     });
 
     it('handles invalid JSON in localStorage gracefully', async () => {
-        localStorage.setItem('auth_token', 'token123');
-        localStorage.setItem('auth_user', 'invalid-json');
+        localStorage.setItem('token', 'token123');
+        localStorage.setItem('user', 'invalid-json');
 
         await act(async () => {
             render(<AuthProvider><TestComponent /></AuthProvider>);
         });
 
-        expect(localStorage.getItem('auth_token')).toBeNull();
+        expect(localStorage.getItem('token')).toBeNull();
         expect(screen.getByTestId('user')).toHaveTextContent('no-user');
     });
 
     it('handles logout correctly', async () => {
-        localStorage.setItem('auth_token', 'token123');
-        localStorage.setItem('auth_user', JSON.stringify({ nombre: 'Test' }));
+        localStorage.setItem('token', 'token123');
+        localStorage.setItem('user', JSON.stringify({ nombre: 'Test' }));
 
         await act(async () => {
             render(<AuthProvider><TestComponent /></AuthProvider>);
@@ -76,13 +76,21 @@ describe('AuthContext', () => {
         const logoutBtn = screen.getByText('Logout');
         fireEvent.click(logoutBtn);
 
-        expect(localStorage.getItem('auth_token')).toBeNull();
+        expect(localStorage.getItem('token')).toBeNull();
         expect(screen.getByTestId('user')).toHaveTextContent('no-user');
     });
 
     it('throws error if useAuth is used outside provider', () => {
+        // Suppress console error for this test
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-        expect(() => render(<TestComponent />)).toThrow('useAuth debe usarse dentro de AuthProvider');
+
+        // Use a separate component that calls useAuth without a provider
+        const ImproperlyUsedComponent = () => {
+            useAuth();
+            return null;
+        };
+
+        expect(() => render(<ImproperlyUsedComponent />)).toThrow('useAuth debe usarse dentro de AuthProvider');
         consoleSpy.mockRestore();
     });
 });

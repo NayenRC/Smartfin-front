@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { MoveRight, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getDashboardSummary } from "../services/dashboardService";
+import { getDashboardSummary, getDashboardResumen } from "../services/dashboardService";
 
 // Components
 import ExpensesChart from "../components/dashboard/ExpensesChart";
@@ -12,13 +12,18 @@ import SavingsGoals from "../components/dashboard/SavingsGoals";
 const Dashboard = () => {
   const { user, getToken } = useAuth();
   const [data, setData] = useState(null);
+  const [resumen, setResumen] = useState({ ingresos: 0, gastos: 0, balance: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const summary = await getDashboardSummary();
+        const [summary, resBridge] = await Promise.all([
+          getDashboardSummary(),
+          getDashboardResumen()
+        ]);
         setData(summary);
+        setResumen(resBridge);
       } catch (error) {
         console.error("Error loading dashboard:", error);
       } finally {
@@ -76,7 +81,7 @@ const Dashboard = () => {
           </div>
           <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Ingresos Totales</p>
           <h3 className="text-3xl font-extrabold text-white mt-1 group-hover:text-neon-green transition-colors">
-            ${data.income?.toLocaleString() || 0}
+            ${resumen.ingresos?.toLocaleString() || 0}
           </h3>
           <div className="mt-4 flex items-center text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded w-fit">
             <TrendingUp className="w-3 h-3 mr-1" /> +12% vs mes anterior
@@ -89,7 +94,7 @@ const Dashboard = () => {
           </div>
           <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Gastos Totales</p>
           <h3 className="text-3xl font-extrabold text-white mt-1 group-hover:text-red-400 transition-colors">
-            ${data.expenses?.toLocaleString() || 0}
+            ${resumen.gastos?.toLocaleString() || 0}
           </h3>
           <div className="mt-4 flex items-center text-xs text-red-400 bg-red-400/10 px-2 py-1 rounded w-fit">
             <TrendingDown className="w-3 h-3 mr-1" /> +5% vs mes anterior
@@ -102,7 +107,7 @@ const Dashboard = () => {
           </div>
           <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Balance Actual</p>
           <h3 className="text-3xl font-extrabold text-white mt-1 group-hover:text-neon-purple transition-colors">
-            ${data.balance?.toLocaleString() || 0}
+            ${resumen.balance?.toLocaleString() || 0}
           </h3>
           <div className="mt-4 text-xs text-gray-500">
             Disponible para ahorrar o invertir
@@ -125,7 +130,7 @@ const Dashboard = () => {
             <span className="w-2 h-2 rounded-full bg-neon-green mr-2"></span>
             Balance Mensual
           </h3>
-          <BalanceChart income={data.income || 0} expenses={data.expenses || 0} />
+          <BalanceChart income={resumen.ingresos || 0} expenses={resumen.gastos || 0} />
         </div>
       </div>
 

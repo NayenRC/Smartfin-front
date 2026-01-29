@@ -29,8 +29,8 @@ describe('Chat Page', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
-        localStorage.setItem('auth_token', 'fake-token');
-        localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@example.com' }));
+        localStorage.setItem('token', 'fake-token');
+        localStorage.setItem('user', JSON.stringify({ id: '1', email: 'test@example.com' }));
     });
 
     it('renders initial assistant message', () => {

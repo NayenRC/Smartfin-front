@@ -35,11 +35,10 @@ const renderWithProviders = (ui) => {
 
 describe('Dashboard Page', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
         localStorage.clear();
         // Simulamos un usuario logueado en localStorage
-        localStorage.setItem('auth_token', 'fake-token');
-        localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@example.com', nombre: 'Test' }));
+        localStorage.setItem('token', 'fake-token');
+        localStorage.setItem('user', JSON.stringify({ id: '1', email: 'test@example.com', nombre: 'Test' }));
     });
 
     it('renders dashboard with correct data from API', async () => {
@@ -53,10 +52,13 @@ describe('Dashboard Page', () => {
             ]
         };
 
-        // Dashboard llama a /dashboard/summary y /metas (está dentro del componente SavingsGoals)
+        // Dashboard llama a /dashboard/summary, /dashboard/resumen y /metas
         api.get.mockImplementation((url) => {
             if (url === '/dashboard/summary') {
                 return Promise.resolve({ data: mockSummary });
+            }
+            if (url === '/dashboard/resumen') {
+                return Promise.resolve({ data: { ingresos: 10000, gastos: 4000, balance: 6000 } });
             }
             if (url === '/metas') {
                 return Promise.resolve({ data: [] });

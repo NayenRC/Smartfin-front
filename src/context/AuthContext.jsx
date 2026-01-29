@@ -15,16 +15,16 @@ export const AuthProvider = ({ children }) => {
    */
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem("auth_token");
-      const savedUser = localStorage.getItem("auth_user");
+      const token = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
 
       if (token && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         } catch (e) {
-          localStorage.removeItem("auth_token");
-          localStorage.removeItem("auth_user");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
         }
       }
 
@@ -49,8 +49,8 @@ export const AuthProvider = ({ children }) => {
 
       const { token, user: userData } = response.data;
 
-      localStorage.setItem("auth_token", token);
-      localStorage.setItem("auth_user", JSON.stringify(userData));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
 
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setUser(userData);
@@ -102,8 +102,8 @@ export const AuthProvider = ({ children }) => {
    * 🚪 LOGOUT
    */
   const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
   };
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }) => {
    * 🔐 Obtener token
    */
   const getToken = async () => {
-    return localStorage.getItem("auth_token");
+    return localStorage.getItem("token");
   };
 
   return (

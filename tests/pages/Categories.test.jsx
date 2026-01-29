@@ -38,8 +38,8 @@ describe('Categories Page', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
-        localStorage.setItem('auth_token', 'fake-token');
-        localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@example.com' }));
+        localStorage.setItem('token', 'fake-token');
+        localStorage.setItem('user', JSON.stringify({ id: '1', email: 'test@example.com' }));
 
         // Mock de window.confirm
         vi.spyOn(window, 'confirm').mockImplementation(() => true);
@@ -94,11 +94,15 @@ describe('Categories Page', () => {
 
         renderWithProviders(<Categories />);
 
-        const createBtn = screen.getByRole('button', { name: /nueva categoría/i });
+        // Esperar a que pase el loading inicial
+        const createBtn = await screen.findByRole('button', { name: /nueva categoría/i });
         fireEvent.click(createBtn);
 
-        fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: 'Ocio' } });
-        fireEvent.click(screen.getByRole('button', { name: /crear/i }));
+        const input = await screen.findByLabelText(/nombre/i);
+        fireEvent.change(input, { target: { value: 'Ocio' } });
+
+        const submitBtn = screen.getByRole('button', { name: /crear/i });
+        fireEvent.click(submitBtn);
 
         await waitFor(() => {
             expect(api.post).toHaveBeenCalled();
@@ -113,13 +117,17 @@ describe('Categories Page', () => {
 
         renderWithProviders(<Categories />);
 
-        await waitFor(() => screen.getByText('Comida'));
+        const comidaText = await screen.findByText('Comida');
+        expect(comidaText).toBeInTheDocument();
 
         const editBtn = screen.getByTitle(/editar/i);
         fireEvent.click(editBtn);
 
-        fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: 'Restaurantes' } });
-        fireEvent.click(screen.getByRole('button', { name: /actualizar/i }));
+        const input = await screen.findByLabelText(/nombre/i);
+        fireEvent.change(input, { target: { value: 'Restaurantes' } });
+
+        const updateBtn = screen.getByRole('button', { name: /actualizar/i });
+        fireEvent.click(updateBtn);
 
         await waitFor(() => {
             expect(api.put).toHaveBeenCalled();
