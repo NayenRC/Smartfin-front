@@ -9,6 +9,22 @@ import ExpensesChart from "../components/dashboard/ExpensesChart";
 import BalanceChart from "../components/dashboard/BalanceChart";
 import SavingsGoals from "../components/dashboard/SavingsGoals";
 
+const DUMMY_SUMMARY = {
+  expensesByCategory: [
+    { name: "Alimentación", value: 150000, color: "#8b5cf6" },
+    { name: "Transporte", value: 80000, color: "#10b981" },
+    { name: "Ocio", value: 50000, color: "#f59e0b" },
+    { name: "Salud", value: 30000, color: "#ef4444" },
+    { name: "Otros", value: 20000, color: "#6b7280" }
+  ]
+};
+
+const DUMMY_RESUMEN = {
+  ingresos: 1200000,
+  gastos: 330000,
+  balance: 870000
+};
+
 const Dashboard = () => {
   const { user, getToken } = useAuth();
   const [data, setData] = useState(null);
@@ -22,10 +38,12 @@ const Dashboard = () => {
           getDashboardSummary(),
           getDashboardResumen()
         ]);
-        setData(summary);
-        setResumen(resBridge);
+        setData(summary || DUMMY_SUMMARY);
+        setResumen(resBridge || DUMMY_RESUMEN);
       } catch (error) {
-        console.error("Error loading dashboard:", error);
+        console.error("Error loading dashboard (using dummy data):", error);
+        setData(DUMMY_SUMMARY);
+        setResumen(DUMMY_RESUMEN);
       } finally {
         setLoading(false);
       }
