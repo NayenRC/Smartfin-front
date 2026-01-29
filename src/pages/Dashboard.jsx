@@ -7,6 +7,7 @@ import { getDashboardSummary } from "../services/dashboardService";
 // Components
 import ExpensesChart from "../components/dashboard/ExpensesChart";
 import BalanceChart from "../components/dashboard/BalanceChart";
+import SavingsGoals from "../components/dashboard/SavingsGoals";
 
 const Dashboard = () => {
   const { user, getToken } = useAuth();
@@ -125,6 +126,17 @@ const Dashboard = () => {
             Balance Mensual
           </h3>
           <BalanceChart income={data.income || 0} expenses={data.expenses || 0} />
+        </div>
+      </div>
+
+      {/* Secondary Section - Savings & History (Future) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 h-[400px]">
+          <SavingsGoals />
+        </div>
+        {/* Placeholder for future components or chat history summary */}
+        <div className="lg:col-span-2 h-[400px] bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 flex items-center justify-center text-gray-500">
+          <p>Historial de transacciones (Próximamente)</p>
         </div>
       </div>
     </div>
