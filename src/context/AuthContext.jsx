@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
 /**
- * Contexto de autenticación unificado con el Backend de Railway
+ * Contexto de autenticación unificado
  */
 const AuthContext = createContext(null);
 
@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   /**
-   * Inicialización: Recuperar token de localStorage y validar perfil
+   * Inicialización: recuperar sesión desde localStorage
    */
   useEffect(() => {
     const initAuth = async () => {
@@ -21,13 +21,13 @@ export const AuthProvider = ({ children }) => {
       if (token && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
-          // Opcional: Validar token con /auth/profile
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         } catch (e) {
           localStorage.removeItem("auth_token");
           localStorage.removeItem("auth_user");
         }
       }
+
       setLoading(false);
     };
 
@@ -35,13 +35,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * 🔑 LOGIN (vía Backend)
+   * 🔑 LOGIN
    */
   const login = async (email, password) => {
+    setLoading(true);
     try {
       console.log("🔐 Intentando login con:", email);
-      const response = await api.post("/auth/login", { email, password });
-      console.log("✅ Login exitoso:", response.data);
+
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
       const { token, user: userData } = response.data;
 
       localStorage.setItem("auth_token", token);
@@ -55,39 +60,48 @@ export const AuthProvider = ({ children }) => {
       console.error("❌ ERROR LOGIN:", error.response?.data || error.message);
       return {
         success: false,
-        message: error.response?.data?.message || "Error al iniciar sesión"
+        message:
+          error.response?.data?.message || "Error al iniciar sesión",
       };
+    } finally {
+      setLoading(false);
     }
   };
 
   /**
-   * 📝 REGISTER (vía Backend)
+   * 📝 REGISTER
    */
   const register = async (email, password, name = "") => {
+    setLoading(true);
     try {
       console.log("📝 Intentando registro:", { email, name });
-      // Nota: El backend espera 'name' (nombre en la DB)
+
       const response = await api.post("/auth/register", {
         email,
         password,
-        name: name || email.split('@')[0]
+        name: name || email.split("@")[0],
       });
 
-      console.log("✅ Registro exitoso:", response.data);
-      return { success: true, message: response.data.message };
+      return {
+        success: true,
+        message: response.data.message,
+      };
     } catch (error) {
       console.error("❌ ERROR REGISTRO:", error.response?.data || error.message);
       return {
         success: false,
-        message: error.response?.data?.message || "Error al registrarse"
+        message:
+          error.response?.data?.message || "Error al registrarse",
       };
+    } finally {
+      setLoading(false);
     }
   };
 
   /**
    * 🚪 LOGOUT
    */
-  const logout = async () => {
+  const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");
     delete api.defaults.headers.common["Authorization"];
@@ -95,7 +109,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * 🔐 getToken
+   * 🔐 Obtener token
    */
   const getToken = async () => {
     return localStorage.getItem("auth_token");
@@ -118,6 +132,9 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+/**
+ * Hook de consumo
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
