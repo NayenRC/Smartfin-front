@@ -1,61 +1,113 @@
-# Student Frontend Project Example
+📱 Smartfin-front
+🧠 Descripción
 
-This is a **React + Vite** frontend template designed to help you learn modern web development practices. It uses **Tailwind CSS** for styling and includes examples of Authentication, Routing, and CRUD operations connected to a backend.
+Smartfin-front es una aplicación frontend moderna desarrollada con React + Vite + Tailwind CSS, pensada para consumir un backend financiero y ofrecer una experiencia de usuario clara, rápida y responsiva.
 
-## 🚀 Getting Started
+Forma parte del ecosistema SmartFin, integrándose con el backend de finanzas y chatbot inteligente.
 
-### 1. Prerequisites
+🚀 Funcionalidades principales
 
-- Node.js (v14 or higher) installed.
-- The backend project running on port 3000 (default).
+Interfaz moderna y responsive
 
-### 2. Installation
+Autenticación de usuarios
 
-Open your terminal in this folder and run:
+Rutas protegidas
 
-```bash
+Consumo de API REST
+
+Manejo de estado con Context API
+
+Preparado para integración con IA
+
+🛠️ Tecnologías utilizadas
+
+React
+
+Vite
+
+Tailwind CSS
+
+JavaScript (ES6+)
+
+Axios / Fetch
+
+React Router
+
+Vercel (deploy)
+
+📦 Requisitos previos
+
+Node.js 16+
+
+Backend activo (ej: backend-finanzas-chatbot)
+
+Variables de entorno configuradas
+
+📥 Instalación
+git clone https://github.com/NayenRC/Smartfin-front.git
+cd Smartfin-front
 npm install
-```
 
-### 3. Running the Project
+⚙️ Variables de entorno
 
-To start the development server:
+Crea un archivo .env:
 
-```bash
-npm run dev
-```
-
-The app will open at `http://localhost:5173`.
-
-## 📂 Project Structure
-
-- `src/components/ui/` - Reusable UI components (Buttons, Inputs, Cards).
-- `src/context/` - Global state management (Authentication).
-- `src/layouts/` - Page structure (Sidebar, Header).
-- `src/pages/` - Individual screens (Login, Dashboard, Articles).
-- `src/services/` - API communication configuration.
-
-## 🔗 Backend Connection
-
-This project assumes your backend API is running at `http://localhost:3000`.
-To change this, create a `.env` file in the root directory (copy `.env.example` if it exists) and update:
-
-```
 VITE_API_URL=http://localhost:3000
-```
 
-## 📚 Key Concepts to Study
 
-1. **Authentication Context (`AuthContext.jsx`)**: How we store the user content and protect the app.
-2. **Protected Routes (`ProtectedRoute.jsx`)**: Preventing access to pages if not logged in.
-3. **API Interceptors (`api.js`)**: Automatically adding the authentication token to every request.
-4. **Tailwind CSS**: How to style components using utility classes.
+Ajusta la URL según tu backend (Railway, local, etc).
 
-## 📝 Assignments
+▶️ Ejecutar en desarrollo
+npm run dev
 
-1. Register a new user using the backend/postman and try to login here.
-2. Review the code in `Articles.jsx` and try to add a new field to the Article form.
-3. styling: Try changing the color scheme in `tailwind.config.js` or `index.css`.
 
-Happy Coding!
-# Smartfin-front
+La app se ejecutará en:
+
+http://localhost:5173
+
+📁 Estructura del proyecto
+src/
+├── components/    # Componentes reutilizables
+├── context/       # Context API (Auth, etc.)
+├── layouts/       # Layouts generales
+├── pages/         # Páginas principales
+├── services/      # Configuración y llamadas API
+├── App.jsx        # Rutas
+└── main.jsx       # Entry point
+
+🔐 Autenticación
+
+Contexto de autenticación
+
+Protección de rutas privadas
+
+Manejo de tokens
+
+Preparado para JWT
+
+🌐 Integración con Backend
+
+Este frontend está diseñado para trabajar con:
+
+API REST
+
+JWT
+
+Backend Node.js / Express
+
+Chatbot financiero con IA
+
+🚀 Deploy
+
+Proyecto preparado para Vercel:
+
+Conectar repositorio
+
+Configurar variables de entorno
+
+Deploy automático
+
+📄 Licencia
+
+Proyecto con fines educativos y académicos.
+Puedes agregar licencia MIT si lo deseas.
