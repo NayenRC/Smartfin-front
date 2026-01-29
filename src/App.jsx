@@ -3,8 +3,8 @@ import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+// import ForgotPassword from "./pages/ForgotPassword";
+// import ResetPassword from "./pages/ResetPassword";
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
@@ -21,8 +21,8 @@ export default function App() {
         {/* RUTAS PÚBLICAS */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} /> */}
 
         {/* RUTAS PRIVADAS */}
         <Route

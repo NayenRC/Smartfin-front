@@ -97,14 +97,14 @@ const Login = () => {
                 placeholder="••••••••"
                 required
               />
-              <div className="text-right">
+              {/* <div className="text-right">
                 <Link
                   to="/forgot-password"
                   className="text-xs text-neon-green hover:text-neon-purple transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
-              </div>
+              </div> */}
             </div>
 
             {/* Mensajes de feedback */}
