@@ -32,6 +32,7 @@ const SavingsGoals = () => {
             loadGoals();
         } catch (error) {
             console.error("Error creating goal:", error);
+            alert("Error al crear la meta. Por favor verifica los datos o intenta nuevamente.");
         }
     };
 
