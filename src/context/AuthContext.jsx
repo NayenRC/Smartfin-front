@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
       });
+      console.log("✅ LOGIN RESPONSE:", response.data);
 
       const { token, user: userData } = response.data;
 

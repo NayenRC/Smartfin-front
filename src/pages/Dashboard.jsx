@@ -34,12 +34,16 @@ const Dashboard = () => {
     async function loadDashboard() {
       try {
         const data = await getDashboardResumen();
+        console.log("📊 Dashboard resumen:", data);
+        console.log("categorías:", data.por_categoria);
+
 
         setResumen({
-          ingresos: data.total_ingresos ?? 0,
-          gastos: data.total_gastos ?? 0,
+          ingresos: data.ingresos ?? 0,
+          gastos: data.gastos ?? 0,
           balance: data.balance ?? 0,
         });
+
 
         setGastosCategoria(data.por_categoria ?? []);
       } catch (err) {
@@ -84,9 +88,8 @@ const Dashboard = () => {
         </div>
 
         <a
-          href={`https://t.me/${
-            import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "Smartfin27_bot"
-          }`}
+          href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "Smartfin27_bot"
+            }`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center px-6 py-3 bg-neon-green/10 text-neon-green border border-neon-green/20 rounded-full hover:bg-neon-green/20 transition-all group font-medium"
