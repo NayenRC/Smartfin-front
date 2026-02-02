@@ -9,7 +9,10 @@ import {
 const COLORS = ["#8b5cf6", "#2563eb", "#3b82f6", "#6366f1", "#0284c7"];
 
 const ExpensesChart = ({ data }) => {
-  const hasData = data && data.length > 0 && data.some(item => item.amount > 0);
+  const hasData =
+    Array.isArray(data) &&
+    data.length > 0 &&
+    data.some(item => Number(item.amount) > 0);
 
   return (
     <div className="bg-card/50 backdrop-blur-glass border border-border rounded-2xl p-6 shadow-sm h-full flex flex-col">

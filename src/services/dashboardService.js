@@ -1,11 +1,17 @@
 import api from "./api";
 
-export async function getDashboardSummary() {
-  const response = await api.get("/dashboard/summary");
+/**
+ * Resumen principal del dashboard
+ */
+export async function getDashboardResumen() {
+  const response = await api.get("/dashboard/resumen");
   return response.data;
 }
 
-export async function getDashboardResumen() {
-  const response = await api.get("/dashboard/resumen");
+/**
+ * Gastos por categoría (si decides separarlo)
+ */
+export async function getGastosPorCategoria() {
+  const response = await api.get("/dashboard/gastos-por-categoria");
   return response.data;
 }

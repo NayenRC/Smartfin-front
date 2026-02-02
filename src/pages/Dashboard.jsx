@@ -1,5 +1,5 @@
+// src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
-
 import { useAuth } from "../context/AuthContext";
 import {
   MoveRight,
@@ -18,41 +18,32 @@ import ExpensesChart from "../components/dashboard/ExpensesChart";
 import BalanceChart from "../components/dashboard/BalanceChart";
 import SavingsGoals from "../components/dashboard/SavingsGoals";
 
-const DUMMY_RESUMEN = {
-  ingresos: 0,
-  gastos: 0,
-  balance: 0,
-};
-
 const Dashboard = () => {
   const { user } = useAuth();
 
-  const [loading, setLoading] = useState(true);
-  const [resumen, setResumen] = useState(DUMMY_RESUMEN);
-  const [gastosCategoria, setGastosCategoria] = useState([]);
+  const [resumen, setResumen] = useState({
+    ingresos: 0,
+    gastos: 0,
+    balance: 0,
+  });
 
-  /* =========================
-     Cargar resumen dashboard
-  ========================= */
+  const [gastosCategoria, setGastosCategoria] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     async function loadDashboard() {
       try {
         const data = await getDashboardResumen();
 
-        console.log("📊 Dashboard resumen:", data);
-        console.log("📊 Gastos por categoría:", data.por_categoria);
-
         setResumen({
-          ingresos: data.total_ingresos || 0,
-          gastos: data.total_gastos || 0,
-          balance: data.balance || 0,
+          ingresos: data.total_ingresos ?? 0,
+          gastos: data.total_gastos ?? 0,
+          balance: data.balance ?? 0,
         });
 
-        setGastosCategoria(data.por_categoria || []);
-      } catch (error) {
-        console.error("❌ Error cargando dashboard:", error);
-        setResumen(DUMMY_RESUMEN);
-        setGastosCategoria([]);
+        setGastosCategoria(data.por_categoria ?? []);
+      } catch (err) {
+        console.error("Error cargando dashboard:", err);
       } finally {
         setLoading(false);
       }
@@ -61,9 +52,6 @@ const Dashboard = () => {
     loadDashboard();
   }, []);
 
-  /* =========================
-     Loading
-  ========================= */
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh] text-gray-400 animate-pulse">
@@ -72,11 +60,15 @@ const Dashboard = () => {
     );
   }
 
+  // 🔑 ADAPTADOR PARA EL GRÁFICO
+  const expensesChartData = gastosCategoria.map((item) => ({
+    category: item.nombre,
+    amount: Number(item.total),
+  }));
+
   return (
     <div className="dashboard space-y-8">
-      {/* =========================
-          Welcome
-      ========================= */}
+      {/* Welcome */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white">
@@ -104,9 +96,7 @@ const Dashboard = () => {
         </a>
       </div>
 
-      {/* =========================
-          KPIs
-      ========================= */}
+      {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="info-card p-6">
           <TrendingUp className="absolute top-4 right-4 w-10 h-10 text-neon-green opacity-20" />
@@ -133,15 +123,13 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* =========================
-          Charts
-      ========================= */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="dashboard-section">
           <h3 className="text-lg font-semibold text-gray-200 mb-6">
             Gastos por Categoría
           </h3>
-          <ExpensesChart data={gastosCategoria} />
+          <ExpensesChart data={expensesChartData} />
         </div>
 
         <div className="dashboard-section">
@@ -155,9 +143,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* =========================
-          Metas + Futuro
-      ========================= */}
+      {/* Metas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 h-[400px]">
           <SavingsGoals />
