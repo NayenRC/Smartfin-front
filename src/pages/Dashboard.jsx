@@ -4,6 +4,7 @@ import { MoveRight, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getDashboardSummary, getDashboardResumen } from "../services/dashboardService";
 
+
 // Components
 import ExpensesChart from "../components/dashboard/ExpensesChart";
 import BalanceChart from "../components/dashboard/BalanceChart";
@@ -30,12 +31,15 @@ const Dashboard = () => {
   const [data, setData] = useState(null);
   const [resumen, setResumen] = useState({ ingresos: 0, gastos: 0, balance: 0 });
   const [loading, setLoading] = useState(true);
+  const [gastosCategoria, setGastosCategoria] = useState([]);
+  const [metas, setMetas] = useState([]);
+
+
 
   useEffect(() => {
     async function loadData() {
       try {
         const [summary, resBridge] = await Promise.all([
-          getDashboardSummary(),
           getDashboardResumen()
         ]);
         setData(summary || DUMMY_SUMMARY);
@@ -47,6 +51,22 @@ const Dashboard = () => {
       } finally {
         setLoading(false);
       }
+      useEffect(() => {
+        getDashboardResumen()
+          .then((data) => {
+            console.log("por categoria:", data.por_categoria); // 👈 clave
+            setGastosCategoria(data.por_categoria || []);
+          })
+          .catch(console.error);
+      }, []);
+
+      useEffect(() => {
+        getMetas()
+          .then(setMetas)
+          .catch(console.error);
+      }, []);
+
+
     }
 
     loadData();
