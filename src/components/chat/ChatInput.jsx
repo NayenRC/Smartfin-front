@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { Send } from "lucide-react";
 
 const ChatInput = ({ onSend }) => {

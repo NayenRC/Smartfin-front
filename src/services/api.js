@@ -1,5 +1,6 @@
+import { supabase } from "./supabaseClient.js";
 import axios from "axios";
-import { supabase } from "./supabaseClient";
+
 
 console.log("🔥 VITE_API_URL =", import.meta.env.VITE_API_URL);
 
