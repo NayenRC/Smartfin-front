@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
-import { apiFetch } from '../services/api';
+import { Navigate } from 'react-router-dom';
 
-export default function Dashboard() {
-  const [profile, setProfile] = useState(null);
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    apiFetch('/auth/profile')
-      .then(setProfile)
-      .catch(err => {
-        console.error(err);
-        localStorage.removeItem('token');
-      });
-  }, []);
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
 
-  if (!profile) return <p>Cargando...</p>;
+  return children;
+};
 
-  return <h1>Hola {profile.user.email}</h1>;
-}
+export default ProtectedRoute;
