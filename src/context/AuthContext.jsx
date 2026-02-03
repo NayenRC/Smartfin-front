@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
 import api from "../services/api";
 
 /**
- * Contexto de autenticación unificado
+ * Contexto de autenticación
+ * - Usa SOLO el backend para auth
+ * - Guarda token + user en localStorage
  */
 const AuthContext = createContext(null);
 
@@ -11,71 +12,75 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /**
-   * Inicialización: recuperar sesión desde localStorage
-   */
+  /* =========================
+     INIT AUTH
+     Recuperar sesión guardada
+  ========================= */
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem("token");
-      const savedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
 
-      if (token && savedUser) {
-        try {
-          setUser(JSON.parse(savedUser));
-        } catch (e) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-        }
+    if (token && savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
+    }
 
-      setLoading(false);
-    };
-
-    initAuth();
+    setLoading(false);
   }, []);
 
-  /**
-   * 🔑 LOGIN
-   */
+  /* =========================
+     🔑 LOGIN
+  ========================= */
   const login = async (email, password) => {
     setLoading(true);
+
     try {
-      console.log("🔐 Intentando login con:", email);
+      console.log("🔐 Intentando login:", email);
 
       const response = await api.post("/auth/login", {
         email,
         password,
       });
-      console.log("✅ LOGIN RESPONSE:", response.data);
 
       const { token, user: userData } = response.data;
 
+      if (!token || !userData) {
+        throw new Error("Respuesta inválida del servidor");
+      }
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
-
       setUser(userData);
 
       return { success: true };
     } catch (error) {
-      console.error("❌ ERROR LOGIN:", error.response?.data || error.message);
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Error interno del servidor";
+
+      console.error("❌ LOGIN ERROR:", message);
+
       return {
         success: false,
-        message:
-          error.response?.data?.message || "Error al iniciar sesión",
+        message,
       };
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * 📝 REGISTER
-   */
+  /* =========================
+     📝 REGISTER
+  ========================= */
   const register = async (email, password, name = "") => {
     setLoading(true);
-    try {
-      console.log("📝 Intentando registro:", { email, name });
 
+    try {
       const response = await api.post("/auth/register", {
         email,
         password,
@@ -87,30 +92,35 @@ export const AuthProvider = ({ children }) => {
         message: response.data.message,
       };
     } catch (error) {
-      console.error("❌ ERROR REGISTRO:", error.response?.data || error.message);
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Error al registrarse";
+
+      console.error("❌ REGISTER ERROR:", message);
+
       return {
         success: false,
-        message:
-          error.response?.data?.message || "Error al registrarse",
+        message,
       };
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * 🚪 LOGOUT
-   */
+  /* =========================
+     🚪 LOGOUT
+  ========================= */
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
   };
 
-  /**
-   * 🔐 Obtener token
-   */
-  const getToken = async () => {
+  /* =========================
+     🔐 GET TOKEN
+  ========================= */
+  const getToken = () => {
     return localStorage.getItem("token");
   };
 
@@ -131,9 +141,9 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/**
- * Hook de consumo
- */
+/* =========================
+   Hook de consumo
+========================= */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
