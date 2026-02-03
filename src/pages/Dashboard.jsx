@@ -12,6 +12,7 @@ import "../styles/dashboard.css";
 
 // Services
 import { getDashboardResumen } from "../services/dashboardService";
+import { getRecentTransactions } from "../services/transactionService";
 
 // Components
 import ExpensesChart from "../components/dashboard/ExpensesChart";
@@ -28,15 +29,19 @@ const Dashboard = () => {
   });
 
   const [gastosCategoria, setGastosCategoria] = useState([]);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const data = await getDashboardResumen();
-        console.log("📊 Dashboard resumen:", data);
-        console.log("categorías:", data.por_categoria);
+        const [data, transactions] = await Promise.all([
+          getDashboardResumen(),
+          getRecentTransactions()
+        ]);
 
+        console.log("📊 Dashboard resumen:", data);
+        console.log("🕒 Recent transactions:", transactions);
 
         setResumen({
           ingresos: data.ingresos ?? 0,
@@ -44,8 +49,8 @@ const Dashboard = () => {
           balance: data.balance ?? 0,
         });
 
-
         setGastosCategoria(data.por_categoria ?? []);
+        setRecentTransactions(transactions);
       } catch (err) {
         console.error("Error cargando dashboard:", err);
       } finally {
@@ -78,7 +83,7 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold text-white">
             Hola,{" "}
             <span className="text-neon-green">
-              {user?.email?.split("@")[0] || "Viajero"}
+              {user?.nombre || user?.email?.split("@")[0] || "Viajero"}
             </span>{" "}
             👋
           </h1>
@@ -146,14 +151,46 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Metas */}
+      {/* Metas y Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 h-[400px]">
+        <div className="lg:col-span-1 min-h-[400px]">
           <SavingsGoals />
         </div>
 
-        <div className="lg:col-span-2 h-[400px] dashboard-section flex items-center justify-center text-gray-500">
-          <p>Historial de transacciones (Próximamente)</p>
+        <div className="lg:col-span-2 min-h-[400px] dashboard-section">
+          <h3 className="text-lg font-semibold text-gray-200 mb-6">Actividad Reciente</h3>
+          {recentTransactions.length > 0 ? (
+            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+              {recentTransactions.map((tx, idx) => (
+                <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2 rounded-lg ${tx.type === 'income' ? 'bg-neon-green/10' : 'bg-red-500/10'}`}>
+                      {tx.type === 'income' ?
+                        <TrendingUp className="w-5 h-5 text-neon-green" /> :
+                        <TrendingDown className="w-5 h-5 text-red-500" />
+                      }
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">{tx.descripcion || 'Sin descripción'}</p>
+                      <p className="text-xs text-gray-500">{new Date(tx.fecha).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-bold ${tx.type === 'income' ? 'text-neon-green' : 'text-red-500'}`}>
+                      {tx.type === 'income' ? '+' : '-'}${Number(tx.monto).toLocaleString()}
+                    </p>
+                    {tx.categoria && <p className="text-xs text-gray-400">{tx.categoria.nombre}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4">
+              <DollarSign className="w-12 h-12 opacity-20" />
+              <p>No hay transacciones recientes</p>
+              <p className="text-xs">¡Empieza a hablar con el bot para ver tus datos aquí!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
