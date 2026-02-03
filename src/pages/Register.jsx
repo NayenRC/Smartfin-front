@@ -1,92 +1,117 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Card from "../components/ui/Card";
 
-export default function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const { register } = useAuth();
+const Register = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { register: authRegister, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
+  // Si ya está logueado, no debería ver register
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    setError("");
+    setLoading(true);
 
-    const result = await register(email, password, name);
+    try {
+      const result = await authRegister(email, password);
 
-    if (result.success) {
-      setSuccess(result.message || 'Registro exitoso. ¡Ahora puedes iniciar sesión!');
-      setTimeout(() => navigate('/'), 2000);
-    } else {
-      setError(result.message);
+      if (result.success) {
+        // Redirigir a Login con mensaje
+        navigate("/", {
+          state: { message: "Cuenta creada exitosamente. Por favor inicia sesión." }
+        });
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError(err.message || "Error al registrarse");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Crea tu cuenta
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-md w-full space-y-8 relative z-10 px-4">
+        <div className="text-center">
+          <h2 className="text-4xl font-extrabold text-white">
+            Crear cuenta en <span className="text-neon-green">Smart</span><span className="text-neon-purple">fin</span>
           </h2>
+          <p className="mt-2 text-sm text-gray-400">
+            Regístrate para comenzar a usar tu asistente financiero
+          </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleRegister}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <input
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Nombre completo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
 
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          {success && <div className="text-green-500 text-sm text-center">{success}</div>}
+        <Card>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
+              id="email"
+              label="Correo Electrónico"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="usuario@ejemplo.com"
+              required
+            />
 
-          <div>
-            <button
+            <Input
+              id="password"
+              label="Contraseña"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 p-4 rounded-lg">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            <Button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              variant="primary"
+              className="w-full flex justify-center py-3 bg-gradient-to-r from-neon-green to-neon-purple hover:opacity-90 transition-opacity border-none text-black font-bold"
+              disabled={loading}
             >
-              Registrarse
-            </button>
-          </div>
+              {loading ? "Creando cuenta..." : "Registrarse"}
+            </Button>
 
-          <div className="text-center">
-            <Link to="/" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-              ¿Ya tienes cuenta? Inicia sesión
-            </Link>
-          </div>
-        </form>
+            <div className="text-sm text-center">
+              <p className="text-gray-400">
+                ¿Ya tienes cuenta?{" "}
+                <Link
+                  to="/"
+                  className="text-neon-green hover:text-neon-purple transition-colors font-medium"
+                >
+                  Inicia sesión
+                </Link>
+              </p>
+            </div>
+          </form>
+        </Card>
       </div>
     </div>
   );
-}
+};
+
+export default Register;

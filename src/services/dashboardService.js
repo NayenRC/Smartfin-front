@@ -1,11 +1,8 @@
 import api from "./api";
 
-/**
- * Resumen principal del dashboard
- */
 export async function getDashboardResumen() {
-  const response = await api.get("/dashboard/resumen");
-  return response.data;
+  const res = await api.get("/dashboard/resumen");
+  return res.data;
 }
 
 /**

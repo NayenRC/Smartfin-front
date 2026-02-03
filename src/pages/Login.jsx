@@ -1,87 +1,151 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Card from "../components/ui/Card";
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const { login: authLogin, user } = useAuth();
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
+  const location = useLocation();
 
-  const handleLogin = async (e) => {
+  useEffect(() => {
+    // Mostrar mensaje si viene de registro
+    if (location.state?.message) {
+      setMessage(location.state.message);
+      // Limpiar el estado para que no aparezca al recargar
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
+  /**
+   * Auto–redirect
+   * Si el usuario ya está autenticado,
+   * no debería ver la pantalla de login
+   */
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  /**
+   * Submit del formulario
+   */
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setError("");
+    setMessage(""); // Limpiar mensajes previos
+    setLoading(true);
 
     try {
       const result = await authLogin(email, password);
 
       if (result.success) {
-        console.log('✅ LOGIN OK');
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
         setError(result.message);
       }
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
+      setError(err.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Inicia sesión en tu cuenta
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-md w-full space-y-8 relative z-10 px-4">
+        <div className="text-center">
+          <h2 className="text-4xl font-extrabold text-white">
+            Bienvenid@ a <span className="text-neon-green">Smart</span><span className="text-neon-purple">fin</span>
           </h2>
+          <p className="mt-2 text-sm text-gray-400">
+            Tu asistente financiero inteligente con IA
+          </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
+
+        <Card>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
+              id="email"
+              label="Correo Electrónico"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@email.com"
+              required
+            />
+
+            <div className="space-y-1">
+              <Input
                 id="password"
-                name="password"
+                label="Contraseña"
                 type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
               />
+              <div className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-neon-green hover:text-neon-purple transition-colors"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
+            {/* Mensajes de feedback */}
+            {message && (
+              <div className="bg-green-500/10 border border-green-500/50 p-4 rounded-lg">
+                <p className="text-m text-green-400 font-medium text-center">{message}</p>
+              </div>
+            )}
 
-          <div>
-            <button
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 p-4 rounded-lg">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            <Button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              variant="primary"
+              className="w-full flex justify-center py-3 bg-gradient-to-r from-neon-green to-neon-purple hover:opacity-90 transition-opacity border-none text-black font-bold"
+              disabled={loading}
             >
-              Iniciar sesión
-            </button>
-          </div>
-        </form>
+              {loading ? "Iniciando sesión..." : "Ingresar"}
+            </Button>
+
+            <div className="text-sm text-center">
+              <p className="text-gray-400">
+                ¿No tienes cuenta?{" "}
+                <Link
+                  to="/register"
+                  className="text-neon-green hover:text-neon-purple transition-colors font-medium"
+                >
+                  Regístrate Aquí
+                </Link>
+              </p>
+            </div>
+          </form>
+        </Card>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
