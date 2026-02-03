@@ -1,23 +1,22 @@
-import { supabase } from "./supabaseClient.js";
-/*
-import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
+export async function apiFetch(endpoint, options = {}) {
+  const token = localStorage.getItem('token');
 
-console.log("🔥 VITE_API_URL =", import.meta.env.VITE_API_URL);
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
+  });
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
+  const data = await res.json();
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (!res.ok) {
+    throw new Error(data.message || 'Error en la API');
   }
 
-  return config;
-});
-
-export default api;
-*/
+  return data;
+}

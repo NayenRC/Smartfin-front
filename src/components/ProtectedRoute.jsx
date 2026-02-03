@@ -1,25 +1,19 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from 'react';
+import { apiFetch } from '../services/api';
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+export default function Dashboard() {
+  const [profile, setProfile] = useState(null);
 
-  // Mientras Supabase valida sesión
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-400">
-        Cargando...
-      </div>
-    );
-  }
+  useEffect(() => {
+    apiFetch('/auth/profile')
+      .then(setProfile)
+      .catch(err => {
+        console.error(err);
+        localStorage.removeItem('token');
+      });
+  }, []);
 
-  // No autenticado → login
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  if (!profile) return <p>Cargando...</p>;
 
-  // Autenticado → renderiza
-  return children;
-};
-
-export default ProtectedRoute;
+  return <h1>Hola {profile.user.email}</h1>;
+}
