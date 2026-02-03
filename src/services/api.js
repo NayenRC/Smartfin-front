@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient.js";
+/*
 import axios from "axios";
 
 
@@ -19,3 +20,4 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
+*/
