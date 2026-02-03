@@ -1,29 +1,27 @@
 import axios from 'axios';
 
-// 1. Obtener URL y limpiarla (Blindaje anti doble slash)
-let envUrl = import.meta.env.VITE_API_URL;
+// Obtener la URL base
+let baseURL = import.meta.env.VITE_API_URL;
 
-if (envUrl && envUrl.endsWith('/')) {
-    envUrl = envUrl.slice(0, -1);
+// 🛡️ Eliminar slash final si existe para evitar el error "api//auth"
+if (baseURL && baseURL.endsWith('/')) {
+  baseURL = baseURL.slice(0, -1);
 }
 
 const api = axios.create({
-    baseURL: envUrl,
-    headers: {
-        'Content-Type': 'application/json',
-    }
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// 2. Interceptor para el Token (Mantiene tu sesión activa)
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+// Interceptor para inyectar el token en cada petición
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default api;
