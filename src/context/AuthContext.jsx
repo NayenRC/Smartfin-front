@@ -50,6 +50,7 @@ export const AuthProvider = ({ children }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        nombre: "Usuario", // Default value to satisfy backend requirement
         email: email,
         password: password,
       }),
