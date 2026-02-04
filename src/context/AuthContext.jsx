@@ -32,41 +32,55 @@ export const AuthProvider = ({ children }) => {
   // =========================
   // REGISTER
   // =========================
-  const register = async ({ name, email, password }) => {
-    try {
-      const data = await authService.register({ name, email, password });
+  // En tu AuthContext.js (ejemplo aproximado)
 
-      return {
-        success: true,
-        data,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || "Error al registrarse",
-      };
+  const register = async (userData) => {
+    const response = await fetch("TU_URL_BACKEND/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // <--- IMPORTANTE
+      },
+      body: JSON.stringify(userData), // <--- IMPORTANTE
+    });
+
+    const data = await response.json();
+
+    // AQUÍ ESTÁ EL TRUCO:
+    // Verificamos manualmente si la respuesta no fue exitosa (status fuera de 200-299)
+    if (!response.ok) {
+      // Lanzamos el error para que tu componente Register.js caiga en el CATCH
+      throw new Error(data.message || "Error al registrar usuario");
     }
+
+    // Si todo salió bien, guardamos usuario o retornamos true
+    return data;
   };
 
   // =========================
   // LOGIN
   // =========================
-  const login = async (email, password) => {
-    try {
-      const data = await authService.login({ email, password });
+  // En tu AuthContext.js
 
-      setUser(data.user);
+  const login = async (credentials) => {
+    const response = await fetch("TU_URL_BACKEND/api/login", {
+      method: "POST",
+      headers: {
+        // Si te falta esta línea, el servidor no entiende que le envías JSON
+        // y por eso dice "Email y contraseña requeridos"
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
 
-      return {
-        success: true,
-        data,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message || "Credenciales inválidas",
-      };
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al iniciar sesión");
     }
+
+    // Aquí actualizas tu estado de usuario (setUser)
+    setUser(data.user);
+    // O guardas el token en localStorage
   };
 
   // =========================
