@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// ⚠️ URL BASE DEL BACKEND (Railway)
+// ✅ URL BASE CORRECTA
 const API_URL = 'https://backend-finanzas-chatbot-production.up.railway.app/api';
 
 // ======================
@@ -14,15 +14,18 @@ export async function register({ name, email, password }) {
       password,
     });
 
-    // Guardar token si viene
     if (response.data?.token) {
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
     }
 
-    return response.data;
+    return { success: true, ...response.data };
   } catch (error) {
     console.error('REGISTER ERROR:', error.response?.data || error.message);
-    throw error.response?.data || error;
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Error al registrarse',
+    };
   }
 }
 
@@ -36,20 +39,23 @@ export async function login({ email, password }) {
       password,
     });
 
-    // Guardar token
     if (response.data?.token) {
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
     }
 
-    return response.data;
+    return { success: true, ...response.data };
   } catch (error) {
     console.error('LOGIN ERROR:', error.response?.data || error.message);
-    throw error.response?.data || error;
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Error al iniciar sesión',
+    };
   }
 }
 
 // ======================
-// PROFILE (TEST TOKEN)
+// PROFILE
 // ======================
 export async function getProfile() {
   const token = localStorage.getItem('token');
