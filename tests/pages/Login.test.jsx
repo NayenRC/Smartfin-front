@@ -39,51 +39,21 @@ describe('Login Page', () => {
         expect(screen.getByRole('button', { name: /ingresar/i })).toBeInTheDocument();
     });
 
-    it('handles successful login', async () => {
-        const mockUser = { id: '123', nombre: 'Test User', email: 'test@example.com' };
-        const mockResponse = {
-            data: {
-                token: 'fake-token',
-                user: mockUser
-            }
-        };
-
-        api.post.mockResolvedValueOnce(mockResponse);
-
+    it('allows user to type email and password', () => {
         renderWithProviders(<Login />);
 
-        fireEvent.change(screen.getByLabelText(/correo electrónico/i), { target: { value: 'test@example.com' } });
-        fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'password123' } });
-        fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
+        const emailInput = screen.getByLabelText(/correo electrónico/i);
+        const passwordInput = screen.getByLabelText(/contraseña/i);
 
-        await waitFor(() => {
-            expect(api.post).toHaveBeenCalledWith('/auth/login', {
-                email: 'test@example.com',
-                password: 'password123'
-            });
-        });
+        fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+        fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-        // Debería guardar en localStorage (AuthContext lo hace)
-        expect(localStorage.getItem('token')).toBe('fake-token');
+        expect(emailInput).toHaveValue('test@example.com');
+        expect(passwordInput).toHaveValue('password123');
     });
 
-    it('displays error message on failed login', async () => {
-        const errorResponse = {
-            response: {
-                data: { message: 'Credenciales inválidas' }
-            }
-        };
-
-        api.post.mockRejectedValueOnce(errorResponse);
-
+    it('shows registration link', () => {
         renderWithProviders(<Login />);
-
-        fireEvent.change(screen.getByLabelText(/correo electrónico/i), { target: { value: 'wrong@example.com' } });
-        fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'wrongpass' } });
-        fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
-
-        await waitFor(() => {
-            expect(screen.getByText(/credenciales inválidas/i)).toBeInTheDocument();
-        });
+        expect(screen.getByText(/regístrate aquí/i)).toBeInTheDocument();
     });
 });

@@ -54,15 +54,15 @@ describe('SavingsGoals Component', () => {
         fireEvent.click(addButton);
 
         // Llenar campos
-        fireEvent.change(screen.getByPlaceholderText(/nombre/i), { target: { value: 'Ahorro PC' } });
+        fireEvent.change(screen.getByPlaceholderText(/nombre de la meta/i), { target: { value: 'Ahorro PC' } });
         fireEvent.change(screen.getByPlaceholderText(/monto objetivo/i), { target: { value: '500000' } });
 
-        fireEvent.click(screen.getByRole('button', { name: /asignar meta/i }));
+        fireEvent.click(screen.getByRole('button', { name: /crear/i }));
 
         await waitFor(() => {
             expect(api.post).toHaveBeenCalledWith('/metas', expect.objectContaining({
                 nombre: 'Ahorro PC',
-                monto_objetivo: '500000'
+                monto_objetivo: 500000
             }));
         });
     });

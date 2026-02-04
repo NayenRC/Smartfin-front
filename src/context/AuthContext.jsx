@@ -15,12 +15,40 @@ export const AuthProvider = ({ children }) => {
   // =========================
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
 
-    if (token) {
+    if (token && savedUser) {
+      // Si tenemos token y usuario guardado, restauramos la sesión
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Error parsing saved user:", e);
+        localStorage.removeItem("user");
+      }
+      
+      // Verificamos que el token siga siendo válido
       authService
         .getProfile()
         .then((data) => {
-          setUser(data.user || data);
+          const userData = data.user || data;
+          setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
+        })
+        .catch(() => {
+          // Token inválido, limpiamos todo
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else if (token) {
+      // Solo tenemos token, intentamos obtener el perfil
+      authService
+        .getProfile()
+        .then((data) => {
+          const userData = data.user || data;
+          setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
         })
         .catch(() => {
           localStorage.removeItem("token");
@@ -97,8 +125,11 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", data.token);
     }
 
-    // Guardamos el usuario en el estado
-    setUser(data.user);
+    // Guardamos el usuario en el estado y en localStorage
+    if (data.user) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+    }
 
     return { success: true, ...data };
   };
@@ -108,6 +139,7 @@ export const AuthProvider = ({ children }) => {
   // =========================
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
   };
 

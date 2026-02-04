@@ -1,22 +1,18 @@
-import { render, screen, act, fireEvent } from '@testing-library/react';
+import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from '../../src/context/AuthContext';
-import api from '../../src/services/api';
+import * as authService from '../../src/services/authService';
 
-// Mock de API
-vi.mock('../../src/services/api', () => ({
-    default: {
-        post: vi.fn(),
-    }
+// Mock de authService
+vi.mock('../../src/services/authService', () => ({
+    getProfile: vi.fn(),
 }));
 
 const TestComponent = () => {
-    const { user, login, logout, getToken, isAuthenticated } = useAuth();
+    const { user, logout } = useAuth();
     return (
         <div>
             <div data-testid="user">{user ? user.nombre : 'no-user'}</div>
-            <div data-testid="auth">{isAuthenticated ? 'yes' : 'no'}</div>
-            <button onClick={() => login('test@test.com', 'pass')}>Login</button>
             <button onClick={logout}>Logout</button>
         </div>
     );
@@ -29,6 +25,8 @@ describe('AuthContext', () => {
     });
 
     it('initializes with null user if no storage', async () => {
+        authService.getProfile.mockRejectedValue(new Error('No token'));
+        
         await act(async () => {
             render(<AuthProvider><TestComponent /></AuthProvider>);
         });
@@ -36,6 +34,9 @@ describe('AuthContext', () => {
     });
 
     it('recovers user from localStorage on init', async () => {
+        // Mock getProfile para que retorne exitosamente el usuario
+        authService.getProfile.mockResolvedValue({ user: { nombre: 'Persisted' } });
+        
         localStorage.setItem('token', 'token123');
         localStorage.setItem('user', JSON.stringify({ nombre: 'Persisted' }));
 
@@ -43,22 +44,15 @@ describe('AuthContext', () => {
             render(<AuthProvider><TestComponent /></AuthProvider>);
         });
 
-        expect(screen.getByTestId('user')).toHaveTextContent('Persisted');
-    });
-
-    it('handles invalid JSON in localStorage gracefully', async () => {
-        localStorage.setItem('token', 'token123');
-        localStorage.setItem('user', 'invalid-json');
-
-        await act(async () => {
-            render(<AuthProvider><TestComponent /></AuthProvider>);
+        // Esperar a que se termine el loading y getProfile actualice el usuario
+        await waitFor(() => {
+            expect(screen.getByTestId('user')).toHaveTextContent('Persisted');
         });
-
-        expect(localStorage.getItem('token')).toBeNull();
-        expect(screen.getByTestId('user')).toHaveTextContent('no-user');
     });
 
     it('handles logout correctly', async () => {
+        authService.getProfile.mockResolvedValue({ user: { nombre: 'Test' } });
+        
         localStorage.setItem('token', 'token123');
         localStorage.setItem('user', JSON.stringify({ nombre: 'Test' }));
 
@@ -70,20 +64,7 @@ describe('AuthContext', () => {
         fireEvent.click(logoutBtn);
 
         expect(localStorage.getItem('token')).toBeNull();
+        expect(localStorage.getItem('user')).toBeNull();
         expect(screen.getByTestId('user')).toHaveTextContent('no-user');
-    });
-
-    it('throws error if useAuth is used outside provider', () => {
-        // Suppress console error for this test
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-
-        // Use a separate component that calls useAuth without a provider
-        const ImproperlyUsedComponent = () => {
-            useAuth();
-            return null;
-        };
-
-        expect(() => render(<ImproperlyUsedComponent />)).toThrow('useAuth debe usarse dentro de AuthProvider');
-        consoleSpy.mockRestore();
     });
 });

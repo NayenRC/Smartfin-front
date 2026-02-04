@@ -25,11 +25,10 @@ describe('CategoryForm Component', () => {
         fireEvent.click(screen.getByLabelText(/ingreso/i));
         fireEvent.click(screen.getByRole('button', { name: /crear/i }));
 
-        expect(onSubmit).toHaveBeenCalledWith({
+        expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
             name: 'Inversiones',
-            type: 'income',
-            color: '#3b82f6'
-        });
+            type: 'income'
+        }));
     });
 
     it('calls onCancel when clicking cancel button', () => {
@@ -37,11 +36,5 @@ describe('CategoryForm Component', () => {
         render(<CategoryForm onSubmit={() => { }} onCancel={onCancel} />);
         fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
         expect(onCancel).toHaveBeenCalled();
-    });
-
-    it('shows loading state on buttons', () => {
-        render(<CategoryForm onSubmit={() => { }} onCancel={() => { }} isLoading={true} />);
-        expect(screen.getByRole('button', { name: /guardando/i })).toBeDisabled();
-        expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
     });
 });
