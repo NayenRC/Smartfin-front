@@ -1,82 +1,80 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
-/**
- * Contexto de Autenticación
- * - Usa SOLO el backend
- * - Guarda token + user en localStorage
- */
-
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* =========================
-     INIT AUTH
-     Recuperar sesión guardada
-  ========================= */
+  // =========================
+  // INIT AUTH
+  // =========================
   useEffect(() => {
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
 
     if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
+      setUser(JSON.parse(savedUser));
     }
 
     setLoading(false);
   }, []);
 
-  /* =========================
-     LOGIN
-  ========================= */
-  const login = async ({ email, password }) => {
+  // =========================
+  // LOGIN
+  // =========================
+  const login = async (email, password) => {
     try {
-      const { data } = await api.post("/login", {
+      console.log("Intentando login:", { email, password });
+
+      const response = await api.post("/login", {
         email,
         password,
       });
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      const { token, user } = response.data;
 
-      setUser(data.user);
-      return data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+
+      return { success: true };
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Credenciales inválidas"
-      );
+      console.error("LOGIN ERROR:", error.response?.data || error.message);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Error interno del servidor",
+      };
     }
   };
 
-  /* =========================
-     REGISTER
-  ========================= */
+  // =========================
+  // REGISTER
+  // =========================
   const register = async ({ name, email, password }) => {
     try {
-      const { data } = await api.post("/register", {
+      const response = await api.post("/register", {
         name,
         email,
         password,
       });
 
-      return data;
+      return { success: true };
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Error al registrar usuario"
-      );
+      console.error("REGISTER ERROR:", error.response?.data || error.message);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Error al registrarse",
+      };
     }
   };
 
-  /* =========================
-     LOGOUT
-  ========================= */
+  // =========================
+  // LOGOUT
+  // =========================
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -98,9 +96,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/* =========================
-   HOOK
-========================= */
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
