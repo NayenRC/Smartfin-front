@@ -35,14 +35,12 @@ export const AuthProvider = ({ children }) => {
   // =========================
   // REGISTER
   // =========================
-  const register = async (email, password) => {
+  const register = async (name, email, password) => {
     // Validación ANTES del fetch
-    if (!email || !password) {
-      console.error("Email o password vacío");
-      return { success: false, message: "Email y contraseña son requeridos" };
+    if (!name || !email || !password) {
+      console.error("Nombre, email o password vacío");
+      return { success: false, message: "Nombre, email y contraseña son requeridos" };
     }
-
-
 
     const response = await fetch(`${API_URL}/api/auth/register`, {
       method: "POST",
@@ -50,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        nombre: "Usuario", // Default value to satisfy backend requirement
+        name: name,
         email: email,
         password: password,
       }),

@@ -62,7 +62,7 @@ export async function register(email, password) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      nombre: "Usuario",
+      name: "Usuario",
       email: email,
       password: password,
     }),

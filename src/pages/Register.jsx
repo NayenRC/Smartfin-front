@@ -6,6 +6,7 @@ import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
 
 const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,8 +28,8 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Llamar register con email y password directamente
-      const result = await authRegister(email, password);
+      // Llamar register con name, email y password
+      const result = await authRegister(name, email, password);
 
       if (result.success) {
         // Registro OK → volver a login
@@ -66,6 +67,16 @@ const Register = () => {
 
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
+              id="name"
+              label="Nombre"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Tu nombre"
+              required
+            />
+
             <Input
               id="email"
               label="Correo Electrónico"
