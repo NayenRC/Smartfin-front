@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: "Email y contraseña son requeridos" };
     }
 
-    console.log("REGISTER payload:", { email, password });
+
 
     const response = await fetch(`${API_URL}/api/auth/register`, {
       method: "POST",
@@ -74,11 +74,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: "Email y contraseña son requeridos" };
     }
 
-    console.log("HELLO FROM AUTHCONTEXT FETCH (REAL)");
-    console.log("LOGIN API_URL:", API_URL);
     const fullUrl = `${API_URL}/api/auth/login`;
-    console.log("LOGIN Full URL:", fullUrl);
-    console.log("LOGIN payload:", { email, password });
 
     const response = await fetch(fullUrl, {
       method: "POST",
