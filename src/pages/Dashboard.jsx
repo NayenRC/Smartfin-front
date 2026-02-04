@@ -6,6 +6,7 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Percent,
 } from "lucide-react";
 
 import "../styles/dashboard.css";
@@ -40,6 +41,8 @@ const Dashboard = () => {
 
   const [gastosCategoria, setGastosCategoria] = useState([]);
   const [recentTransactions, setRecentTransactions] = useState([]);
+  const [ingresos, setIngresos] = useState([]);
+  const [gastos, setGastos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,6 +64,10 @@ const Dashboard = () => {
 
         setGastosCategoria(data.por_categoria ?? []);
         setRecentTransactions(transactions);
+        
+        // Separar ingresos y gastos de las transacciones
+        setIngresos(transactions.filter(tx => tx.type === 'income'));
+        setGastos(transactions.filter(tx => tx.type === 'expense'));
       } catch (err) {
         console.error("Error cargando dashboard:", err);
       } finally {
@@ -115,7 +122,7 @@ const Dashboard = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="info-card p-6">
           <TrendingUp className="absolute top-4 right-4 w-10 h-10 text-neon-green opacity-20" />
           <p className="text-gray-400 text-sm uppercase">Ingresos Totales</p>
@@ -138,6 +145,33 @@ const Dashboard = () => {
           <h3 className="text-3xl font-bold text-white">
             ${resumen.balance.toLocaleString()}
           </h3>
+        </div>
+
+        <div className="info-card p-6">
+          <Percent className="absolute top-4 right-4 w-10 h-10 text-yellow-500 opacity-20" />
+          <p className="text-gray-400 text-sm uppercase">% Gastos vs Ingresos</p>
+          <h3 className={`text-3xl font-bold ${
+            resumen.ingresos > 0 
+              ? (resumen.gastos / resumen.ingresos * 100) > 80 
+                ? 'text-red-500' 
+                : (resumen.gastos / resumen.ingresos * 100) > 50 
+                  ? 'text-yellow-500' 
+                  : 'text-neon-green'
+              : 'text-gray-400'
+          }`}>
+            {resumen.ingresos > 0 
+              ? `${((resumen.gastos / resumen.ingresos) * 100).toFixed(1)}%` 
+              : '0%'}
+          </h3>
+          <p className="text-xs text-gray-500 mt-1">
+            {resumen.ingresos > 0 
+              ? (resumen.gastos / resumen.ingresos * 100) > 80 
+                ? '⚠️ Gastos altos' 
+                : (resumen.gastos / resumen.ingresos * 100) > 50 
+                  ? '⚡ Gastos moderados' 
+                  : '✅ Buen control'
+              : 'Sin datos'}
+          </p>
         </div>
       </div>
 
@@ -162,6 +196,58 @@ const Dashboard = () => {
               expenses={resumen.gastos}
             />
           </Suspense>
+        </div>
+      </div>
+
+      {/* Ingresos y Gastos Detallados */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Lista de Ingresos */}
+        <div className="dashboard-section">
+          <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-neon-green" />
+            Últimos Ingresos
+          </h3>
+          {ingresos.length > 0 ? (
+            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {ingresos.map((tx, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-neon-green/5 border border-neon-green/20">
+                  <div>
+                    <p className="font-medium text-white">{tx.descripcion || 'Ingreso'}</p>
+                    <p className="text-xs text-gray-500">{new Date(tx.fecha).toLocaleDateString()}</p>
+                  </div>
+                  <p className="font-bold text-neon-green">+${Number(tx.monto).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">No hay ingresos registrados</p>
+          )}
+        </div>
+
+        {/* Lista de Gastos */}
+        <div className="dashboard-section">
+          <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+            <TrendingDown className="w-5 h-5 text-red-500" />
+            Últimos Gastos
+          </h3>
+          {gastos.length > 0 ? (
+            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {gastos.map((tx, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+                  <div>
+                    <p className="font-medium text-white">{tx.descripcion || 'Gasto'}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(tx.fecha).toLocaleDateString()}
+                      {tx.categoria && <span className="ml-2 text-gray-400">• {tx.categoria.nombre}</span>}
+                    </p>
+                  </div>
+                  <p className="font-bold text-red-500">-${Number(tx.monto).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">No hay gastos registrados</p>
+          )}
         </div>
       </div>
 
