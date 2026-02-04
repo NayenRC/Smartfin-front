@@ -1,16 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
-// Si no usas authService para login/register, asegúrate de que getProfile sí exista ahí
 import * as authService from "../services/authService";
-import express from 'express';
-import cors from 'cors'; // Probablemente ya tienes esto
 
 const AuthContext = createContext(null);
-// === AGREGA ESTAS DOS LÍNEAS URGENTE ===
-app.use(express.json()); 
-app.use(cors());
 
-// TU URL REAL DE RAILWAY (Copiada de tu captura de pantalla)
-const API_URL = "https://backend-finanzas-chatbot-production.up.railway.app";
+// URL del backend desde variable de entorno
+const API_URL = import.meta.env.VITE_API_URL || "https://backend-finanzas-chatbot-production.up.railway.app";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -23,14 +17,12 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // Asumimos que authService.getProfile usa el token guardado
       authService
         .getProfile()
         .then((data) => {
           setUser(data.user || data);
         })
         .catch(() => {
-          // Si el token expiró o es inválido, limpiamos todo
           localStorage.removeItem("token");
           setUser(null);
         })
@@ -43,53 +35,73 @@ export const AuthProvider = ({ children }) => {
   // =========================
   // REGISTER
   // =========================
-  const register = async (userData) => {
-    // Usamos la constante API_URL
-    const response = await fetch(`${API_URL}/api/register`, {
+  const register = async (email, password) => {
+    // Validación ANTES del fetch
+    if (!email || !password) {
+      console.error("Email o password vacío");
+      return { success: false, message: "Email y contraseña son requeridos" };
+    }
+
+    console.log("REGISTER payload:", { email, password });
+
+    const response = await fetch(`${API_URL}/api/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      // Esto hará que tu componente Register muestre el error rojo
       throw new Error(data.message || "Error al registrar usuario");
     }
 
-    // Opcional: Si tu backend devuelve token al registrar, podrías hacer login automático aquí.
-    return data;
+    return { success: true, ...data };
   };
 
   // =========================
   // LOGIN
   // =========================
-  const login = async (credentials) => {
-    const response = await fetch(`${API_URL}/api/login`, {
+  const login = async (email, password) => {
+    // Validación ANTES del fetch
+    if (!email || !password) {
+      console.error("Email o password vacío");
+      return { success: false, message: "Email y contraseña son requeridos" };
+    }
+
+    console.log("LOGIN payload:", { email, password });
+
+    const response = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Error al iniciar sesión");
+      return { success: false, message: data.message || "Error al iniciar sesión" };
     }
 
-    // === CORRECCIÓN IMPORTANTE ===
-    // 1. Guardamos el token para que no se pierda al recargar
+    // Guardamos el token
     if (data.token) {
-        localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token);
     }
-    
-    // 2. Guardamos el usuario en el estado
-    setUser(data.user); 
+
+    // Guardamos el usuario en el estado
+    setUser(data.user);
+
+    return { success: true, ...data };
   };
 
   // =========================

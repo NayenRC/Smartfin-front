@@ -1,57 +1,86 @@
-import axios from 'axios';
-
-// ✅ URL BASE CORRECTA
-const API_URL = 'https://backend-finanzas-chatbot-production.up.railway.app/api';
+// URL BASE desde variable de entorno
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend-finanzas-chatbot-production.up.railway.app';
 
 // ======================
 // REGISTER
 // ======================
-export async function register({ name, email, password }) {
-  try {
-    const response = await axios.post(`${API_URL}/register`, {
-      name,
-      email,
-      password,
-    });
+export async function register(email, password) {
+  // Validación ANTES del fetch
+  if (!email || !password) {
+    console.error("Email o password vacío");
+    return { success: false, message: "Email y contraseña son requeridos" };
+  }
 
-    if (response.data?.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
+  console.log("REGISTER payload:", { email, password });
 
-    return { success: true, ...response.data };
-  } catch (error) {
-    console.error('REGISTER ERROR:', error.response?.data || error.message);
+  const response = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error('REGISTER ERROR:', data);
     return {
       success: false,
-      message: error.response?.data?.message || 'Error al registrarse',
+      message: data.message || 'Error al registrarse',
     };
   }
+
+  if (data.token) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+  }
+
+  return { success: true, ...data };
 }
 
 // ======================
 // LOGIN
 // ======================
-export async function login({ email, password }) {
-  try {
-    const response = await axios.post(`${API_URL}/login`, {
-      email,
-      password,
-    });
+export async function login(email, password) {
+  // Validación ANTES del fetch
+  if (!email || !password) {
+    console.error("Email o password vacío");
+    return { success: false, message: "Email y contraseña son requeridos" };
+  }
 
-    if (response.data?.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
+  console.log("LOGIN payload:", { email, password });
 
-    return { success: true, ...response.data };
-  } catch (error) {
-    console.error('LOGIN ERROR:', error.response?.data || error.message);
+  const response = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error('LOGIN ERROR:', data);
     return {
       success: false,
-      message: error.response?.data?.message || 'Error al iniciar sesión',
+      message: data.message || 'Error al iniciar sesión',
     };
   }
+
+  if (data.token) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+  }
+
+  return { success: true, ...data };
 }
 
 // ======================
@@ -60,11 +89,15 @@ export async function login({ email, password }) {
 export async function getProfile() {
   const token = localStorage.getItem('token');
 
-  const response = await axios.get(`${API_URL}/profile`, {
+  const response = await fetch(`${API_URL}/api/auth/profile`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  return response.data;
+  if (!response.ok) {
+    throw new Error('Error al obtener perfil');
+  }
+
+  return response.json();
 }
