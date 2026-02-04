@@ -2,10 +2,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 
 /**
- * Contexto de autenticación
- * - Usa SOLO el backend para auth
+ * Contexto de Autenticación
+ * - Usa SOLO el backend
  * - Guarda token + user en localStorage
  */
+
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -33,83 +34,48 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /* =========================
-     🔑 LOGIN
+     LOGIN
   ========================= */
-  const login = async (email, password) => {
-    setLoading(true);
-
+  const login = async ({ email, password }) => {
     try {
-      console.log("🔐 Intentando login:", email);
-
-      const response = await api.post("/auth/login", {
+      const { data } = await api.post("/login", {
         email,
         password,
       });
 
-      const { token, user: userData } = response.data;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      if (!token || !userData) {
-        throw new Error("Respuesta inválida del servidor");
-      }
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
-
-      return { success: true };
+      setUser(data.user);
+      return data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Error interno del servidor";
-
-      console.error("❌ LOGIN ERROR:", message);
-
-      return {
-        success: false,
-        message,
-      };
-    } finally {
-      setLoading(false);
+      throw new Error(
+        error.response?.data?.message || "Credenciales inválidas"
+      );
     }
   };
 
   /* =========================
-     📝 REGISTER
+     REGISTER
   ========================= */
-  const register = async (email, password, name = "") => {
-    setLoading(true);
-
+  const register = async ({ name, email, password }) => {
     try {
-      const response = await api.post("/auth/register", {
+      const { data } = await api.post("/register", {
+        name,
         email,
         password,
-        name: name || email.split("@")[0],
       });
 
-      return {
-        success: true,
-        message: response.data.message,
-      };
+      return data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Error al registrarse";
-
-      console.error("❌ REGISTER ERROR:", message);
-
-      return {
-        success: false,
-        message,
-      };
-    } finally {
-      setLoading(false);
+      throw new Error(
+        error.response?.data?.message || "Error al registrar usuario"
+      );
     }
   };
 
   /* =========================
-     🚪 LOGOUT
+     LOGOUT
   ========================= */
   const logout = () => {
     localStorage.removeItem("token");
@@ -117,37 +83,24 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  /* =========================
-     🔐 GET TOKEN
-  ========================= */
-  const getToken = () => {
-    return localStorage.getItem("token");
-  };
-
   return (
     <AuthContext.Provider
       value={{
         user,
+        loading,
         login,
         register,
         logout,
-        getToken,
-        loading,
-        isAuthenticated: !!user,
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
 /* =========================
-   Hook de consumo
+   HOOK
 ========================= */
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext);
 };
