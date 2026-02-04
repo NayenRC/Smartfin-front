@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import api from "../services/api";
+import * as authService from "../services/authService";
 
 const AuthContext = createContext(null);
 
@@ -8,66 +8,63 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // =========================
-  // INIT AUTH
+  // INIT AUTH (al cargar la app)
   // =========================
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
 
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (token) {
+      authService
+        .getProfile()
+        .then((data) => {
+          setUser(data.user || data);
+        })
+        .catch(() => {
+          localStorage.removeItem("token");
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-
-    setLoading(false);
   }, []);
-
-  // =========================
-  // LOGIN
-  // =========================
-  const login = async (email, password) => {
-    try {
-      console.log("Intentando login:", { email, password });
-
-      const response = await api.post("/login", {
-        email,
-        password,
-      });
-
-      const { token, user } = response.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-
-      return { success: true };
-    } catch (error) {
-      console.error("LOGIN ERROR:", error.response?.data || error.message);
-      return {
-        success: false,
-        message:
-          error.response?.data?.message || "Error interno del servidor",
-      };
-    }
-  };
 
   // =========================
   // REGISTER
   // =========================
   const register = async ({ name, email, password }) => {
     try {
-      const response = await api.post("/register", {
-        name,
-        email,
-        password,
-      });
+      const data = await authService.register({ name, email, password });
 
-      return { success: true };
+      return {
+        success: true,
+        data,
+      };
     } catch (error) {
-      console.error("REGISTER ERROR:", error.response?.data || error.message);
       return {
         success: false,
-        message:
-          error.response?.data?.message || "Error al registrarse",
+        message: error.message || "Error al registrarse",
+      };
+    }
+  };
+
+  // =========================
+  // LOGIN
+  // =========================
+  const login = async (email, password) => {
+    try {
+      const data = await authService.login({ email, password });
+
+      setUser(data.user);
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || "Credenciales inválidas",
       };
     }
   };
@@ -77,7 +74,6 @@ export const AuthProvider = ({ children }) => {
   // =========================
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setUser(null);
   };
 
@@ -86,8 +82,8 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         loading,
-        login,
         register,
+        login,
         logout,
       }}
     >
