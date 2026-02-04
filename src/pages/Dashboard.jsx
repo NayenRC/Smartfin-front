@@ -1,5 +1,5 @@
 // src/pages/Dashboard.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   MoveRight,
@@ -14,10 +14,20 @@ import "../styles/dashboard.css";
 import { getDashboardResumen } from "../services/dashboardService";
 import { getRecentTransactions } from "../services/transactionService";
 
-// Components
-import ExpensesChart from "../components/dashboard/ExpensesChart";
-import BalanceChart from "../components/dashboard/BalanceChart";
-import SavingsGoals from "../components/dashboard/SavingsGoals";
+// Lazy loading de componentes pesados (Recharts)
+const ExpensesChart = lazy(() => import("../components/dashboard/ExpensesChart"));
+const BalanceChart = lazy(() => import("../components/dashboard/BalanceChart"));
+const SavingsGoals = lazy(() => import("../components/dashboard/SavingsGoals"));
+
+// Skeleton de carga para gráficos
+const ChartSkeleton = () => (
+  <div className="bg-card/50 backdrop-blur-glass border border-border rounded-2xl p-6 shadow-sm h-full flex flex-col animate-pulse">
+    <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
+    <div className="flex-1 flex items-center justify-center">
+      <div className="w-32 h-32 bg-gray-700 rounded-full"></div>
+    </div>
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -131,30 +141,36 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts */}
+      {/* Charts - Con lazy loading */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="dashboard-section">
           <h3 className="text-lg font-semibold text-gray-200 mb-6">
             Gastos por Categoría
           </h3>
-          <ExpensesChart data={expensesChartData} />
+          <Suspense fallback={<ChartSkeleton />}>
+            <ExpensesChart data={expensesChartData} />
+          </Suspense>
         </div>
 
         <div className="dashboard-section">
           <h3 className="text-lg font-semibold text-gray-200 mb-6">
             Balance Mensual
           </h3>
-          <BalanceChart
-            income={resumen.ingresos}
-            expenses={resumen.gastos}
-          />
+          <Suspense fallback={<ChartSkeleton />}>
+            <BalanceChart
+              income={resumen.ingresos}
+              expenses={resumen.gastos}
+            />
+          </Suspense>
         </div>
       </div>
 
       {/* Metas y Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 min-h-[400px]">
-          <SavingsGoals />
+          <Suspense fallback={<ChartSkeleton />}>
+            <SavingsGoals />
+          </Suspense>
         </div>
 
         <div className="lg:col-span-2 min-h-[400px] dashboard-section">

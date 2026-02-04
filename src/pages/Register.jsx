@@ -75,6 +75,7 @@ const Register = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Tu nombre"
               required
+              autoComplete="name"
             />
 
             <Input
@@ -85,6 +86,7 @@ const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="usuario@ejemplo.com"
               required
+              autoComplete="email"
             />
 
             <Input
@@ -95,6 +97,7 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
+              autoComplete="new-password"
             />
 
             {error && (

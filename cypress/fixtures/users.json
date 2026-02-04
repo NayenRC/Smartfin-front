@@ -1,0 +1,16 @@
+{
+  "validUser": {
+    "name": "Usuario Test",
+    "email": "test@smartfin.com",
+    "password": "password123"
+  },
+  "invalidUser": {
+    "email": "noexiste@test.com",
+    "password": "wrongpassword"
+  },
+  "newUser": {
+    "name": "Nuevo Usuario",
+    "email": "nuevo@test.com",
+    "password": "newpassword123"
+  }
+}

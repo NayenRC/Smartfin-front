@@ -86,6 +86,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
               required
+              autoComplete="email"
             />
 
             <div className="space-y-1">
@@ -97,6 +98,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
+                autoComplete="current-password"
               />
               <div className="text-right">
                 <Link

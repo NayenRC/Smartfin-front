@@ -143,6 +143,33 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Mostrar loading mientras se verifica autenticación (con estilos inline para evitar problemas de CSS)
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#020617'
+      }}>
+        <div style={{ textAlign: 'center', color: '#9ca3af' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '3px solid #1e293b',
+            borderTopColor: '#22c55e',
+            borderRadius: '50%',
+            margin: '0 auto 16px',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <p style={{ margin: 0 }}>Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -153,7 +180,7 @@ export const AuthProvider = ({ children }) => {
         logout,
       }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -1,10 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="SmartFin - Tu asistente financiero inteligente con IA. Gestiona tus finanzas personales, categoriza gastos y recibe consejos personalizados." />
+    <meta name="keywords" content="finanzas personales, gestión de gastos, IA financiera, presupuesto, ahorro" />
+    <meta name="author" content="SmartFin" />
+    <meta name="theme-color" content="#22c55e" />
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SmartFin - Asistente Financiero Inteligente" />
+    <meta property="og:description" content="Gestiona tus finanzas personales con inteligencia artificial" />
+    
+    <!-- Performance: Preconnect to API -->
+    <link rel="preconnect" href="https://backend-finanzas-chatbot-production.up.railway.app" crossorigin />
+    <link rel="dns-prefetch" href="https://backend-finanzas-chatbot-production.up.railway.app" />
+    
+    <!-- Critical CSS inline para evitar render blocking -->
+    <style>
+      /* Critical CSS - First Paint */
+      *,*::before,*::after{box-sizing:border-box}
+      html{-webkit-text-size-adjust:100%}
+      body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#020617;color:#e5e7eb}
+      #root{min-height:100vh}
+      .min-h-screen{min-height:100vh}
+      .flex{display:flex}
+      .items-center{align-items:center}
+      .justify-center{justify-content:center}
+      /* Loading spinner */
+      @keyframes spin{to{transform:rotate(360deg)}}
+      .animate-spin{animation:spin 1s linear infinite}
+    </style>
+    
+    <title>SmartFin - Asistente Financiero Inteligente</title>
   </head>
   <body>
     <div id="root"></div>
