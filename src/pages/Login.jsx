@@ -47,7 +47,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const result = await authLogin(email, password);
+      const result = await authLogin(email.trim(), password.trim());
 
       if (result.success) {
         navigate("/dashboard");

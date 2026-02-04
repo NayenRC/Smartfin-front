@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: "Email y contraseña son requeridos" };
     }
 
+    console.log("HELLO FROM AUTHCONTEXT FETCH (REAL)");
     console.log("LOGIN API_URL:", API_URL);
     const fullUrl = `${API_URL}/api/auth/login`;
     console.log("LOGIN Full URL:", fullUrl);

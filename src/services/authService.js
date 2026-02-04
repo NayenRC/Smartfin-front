@@ -29,7 +29,7 @@ export async function login(email, password) {
   const data = await response.json();
 
   if (!response.ok) {
-    console.error('LOGIN ERROR:', data);
+    // console.error('LOGIN ERROR:', data); // SILENCED TO DEBUG EXECUTION PATH
     return {
       success: false,
       message: data.message || 'Error al iniciar sesión',
