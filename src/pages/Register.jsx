@@ -6,6 +6,7 @@ import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
 
 const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,16 +28,18 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const result = await authRegister(email, password);
+      await authRegister({
+        name,
+        email,
+        password,
+      });
 
-      if (result.success) {
-        // Redirigir a Login con mensaje
-        navigate("/", {
-          state: { message: "Cuenta creada exitosamente. Por favor inicia sesión." }
-        });
-      } else {
-        setError(result.message);
-      }
+      // Registro OK → volver a login
+      navigate("/", {
+        state: {
+          message: "Cuenta creada exitosamente. Por favor inicia sesión.",
+        },
+      });
     } catch (err) {
       setError(err.message || "Error al registrarse");
     } finally {
@@ -52,7 +55,9 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8 relative z-10 px-4">
         <div className="text-center">
           <h2 className="text-4xl font-extrabold text-white">
-            Crear cuenta en <span className="text-neon-green">Smart</span><span className="text-neon-purple">fin</span>
+            Crear cuenta en{" "}
+            <span className="text-neon-green">Smart</span>
+            <span className="text-neon-purple">fin</span>
           </h2>
           <p className="mt-2 text-sm text-gray-400">
             Regístrate para comenzar a usar tu asistente financiero
@@ -61,6 +66,16 @@ const Register = () => {
 
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <Input
+              id="name"
+              label="Nombre"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Tu nombre"
+              required
+            />
+
             <Input
               id="email"
               label="Correo Electrónico"
