@@ -1,8 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 // Si no usas authService para login/register, asegúrate de que getProfile sí exista ahí
 import * as authService from "../services/authService";
+import express from 'express';
+import cors from 'cors'; // Probablemente ya tienes esto
 
 const AuthContext = createContext(null);
+// === AGREGA ESTAS DOS LÍNEAS URGENTE ===
+app.use(express.json()); 
+app.use(cors());
 
 // TU URL REAL DE RAILWAY (Copiada de tu captura de pantalla)
 const API_URL = "https://backend-finanzas-chatbot-production.up.railway.app";
