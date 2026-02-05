@@ -15,6 +15,7 @@ import "../styles/dashboard.css";
 import { getDashboardResumen } from "../services/dashboardService";
 import { getRecentTransactions } from "../services/transactionService";
 
+const ChatPanel = lazy(() => import("../components/dashboard/ChatPanel"));
 // Lazy loading de componentes pesados (Recharts)
 const ExpensesChart = lazy(() => import("../components/dashboard/ExpensesChart"));
 const BalanceChart = lazy(() => import("../components/dashboard/BalanceChart"));
@@ -64,7 +65,7 @@ const Dashboard = () => {
 
         setGastosCategoria(data.por_categoria ?? []);
         setRecentTransactions(transactions);
-        
+
         // Separar ingresos y gastos de las transacciones
         setIngresos(transactions.filter(tx => tx.type === 'income'));
         setGastos(transactions.filter(tx => tx.type === 'expense'));
@@ -150,25 +151,24 @@ const Dashboard = () => {
         <div className="info-card p-6">
           <Percent className="absolute top-4 right-4 w-10 h-10 text-yellow-500 opacity-20" />
           <p className="text-gray-400 text-sm uppercase">% Gastos vs Ingresos</p>
-          <h3 className={`text-3xl font-bold ${
-            resumen.ingresos > 0 
-              ? (resumen.gastos / resumen.ingresos * 100) > 80 
-                ? 'text-red-500' 
-                : (resumen.gastos / resumen.ingresos * 100) > 50 
-                  ? 'text-yellow-500' 
+          <h3 className={`text-3xl font-bold ${resumen.ingresos > 0
+              ? (resumen.gastos / resumen.ingresos * 100) > 80
+                ? 'text-red-500'
+                : (resumen.gastos / resumen.ingresos * 100) > 50
+                  ? 'text-yellow-500'
                   : 'text-neon-green'
               : 'text-gray-400'
-          }`}>
-            {resumen.ingresos > 0 
-              ? `${((resumen.gastos / resumen.ingresos) * 100).toFixed(1)}%` 
+            }`}>
+            {resumen.ingresos > 0
+              ? `${((resumen.gastos / resumen.ingresos) * 100).toFixed(1)}%`
               : '0%'}
           </h3>
           <p className="text-xs text-gray-500 mt-1">
-            {resumen.ingresos > 0 
-              ? (resumen.gastos / resumen.ingresos * 100) > 80 
-                ? '⚠️ Gastos altos' 
-                : (resumen.gastos / resumen.ingresos * 100) > 50 
-                  ? '⚡ Gastos moderados' 
+            {resumen.ingresos > 0
+              ? (resumen.gastos / resumen.ingresos * 100) > 80
+                ? '⚠️ Gastos altos'
+                : (resumen.gastos / resumen.ingresos * 100) > 50
+                  ? '⚡ Gastos moderados'
                   : '✅ Buen control'
               : 'Sin datos'}
           </p>
@@ -293,6 +293,13 @@ const Dashboard = () => {
               <p className="text-xs">¡Empieza a hablar con el bot para ver tus datos aquí!</p>
             </div>
           )}
+          {/* Chat con el bot */}
+          <div className="grid grid-cols-1 mt-6">
+            <Suspense fallback={<ChartSkeleton />}>
+              <ChatPanel />
+            </Suspense>
+          </div>
+
         </div>
       </div>
     </div>

@@ -1,9 +1,6 @@
-import api from "./api";
+import axios from "./axiosInstance";
 
-export async function sendMessageToBot(message) {
-  const response = await api.post("/chat", {
-    mensaje: message, // Backend expects 'mensaje'
-  });
-
-  return response.data;
-}
+export const getChatHistory = async () => {
+  const res = await axios.get("/chat/history");
+  return res.data;
+};
