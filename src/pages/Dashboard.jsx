@@ -152,12 +152,12 @@ const Dashboard = () => {
           <Percent className="absolute top-4 right-4 w-10 h-10 text-yellow-500 opacity-20" />
           <p className="text-gray-400 text-sm uppercase">% Gastos vs Ingresos</p>
           <h3 className={`text-3xl font-bold ${resumen.ingresos > 0
-              ? (resumen.gastos / resumen.ingresos * 100) > 80
-                ? 'text-red-500'
-                : (resumen.gastos / resumen.ingresos * 100) > 50
-                  ? 'text-yellow-500'
-                  : 'text-neon-green'
-              : 'text-gray-400'
+            ? (resumen.gastos / resumen.ingresos * 100) > 80
+              ? 'text-red-500'
+              : (resumen.gastos / resumen.ingresos * 100) > 50
+                ? 'text-yellow-500'
+                : 'text-neon-green'
+            : 'text-gray-400'
             }`}>
             {resumen.ingresos > 0
               ? `${((resumen.gastos / resumen.ingresos) * 100).toFixed(1)}%`
@@ -291,6 +291,30 @@ const Dashboard = () => {
               <DollarSign className="w-12 h-12 opacity-20" />
               <p>No hay transacciones recientes</p>
               <p className="text-xs">¡Empieza a hablar con el bot para ver tus datos aquí!</p>
+            </div>
+          )}
+          {recentTransactions.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-4 p-6 text-center">
+              <DollarSign className="w-12 h-12 opacity-20" />
+
+              <p className="text-lg font-medium">
+                Aún no hay movimientos registrados
+              </p>
+
+              <p className="text-sm text-gray-500 max-w-md">
+                Si estás usando <b>SmartBot en Telegram</b>, recuerda que debes
+                <b className="text-neon-green"> vincular tu cuenta</b> para que tus
+                métricas aparezcan aquí.
+              </p>
+
+              <a
+                href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 px-5 py-2 rounded-full bg-neon-green/10 border border-neon-green/30 text-neon-green hover:bg-neon-green/20 transition"
+              >
+                Ir a Telegram y vincular →
+              </a>
             </div>
           )}
           {/* Chat con el bot */}
