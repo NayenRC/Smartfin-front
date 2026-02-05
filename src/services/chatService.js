@@ -1,6 +1,18 @@
-import axios from "./axiosInstance";
+const API_URL = import.meta.env.VITE_API_URL;
 
-export const getChatHistory = async () => {
-  const res = await axios.get("/chat/history");
-  return res.data;
-};
+export async function getChatHistory() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/chat/history`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Error al obtener historial de chat");
+  }
+
+  return res.json();
+}
