@@ -29,9 +29,8 @@ export async function sendMessageToBot(message) {
 export async function getChatHistory() {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API_URL}/chat/history`, {
+  const res = await fetch(`${API_URL}/api/chat/history`, {
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
@@ -42,3 +41,4 @@ export async function getChatHistory() {
 
   return res.json();
 }
+
