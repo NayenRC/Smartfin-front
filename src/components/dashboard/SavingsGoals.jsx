@@ -1,21 +1,14 @@
 import { useEffect, useState } from "react";
-
-import { Plus, Target, Trash2, Trophy } from "lucide-react";
+import { Trophy, Target } from "lucide-react";
 import api from "../../services/api";
 import "../../styles/dashboard.css";
 
 const SavingsGoals = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-
-  const [newGoal, setNewGoal] = useState({
-    nombre: "",
-    monto_objetivo: "",
-  });
 
   /* =========================
-     Cargar metas
+     Cargar metas (solo lectura)
   ========================= */
   useEffect(() => {
     loadGoals();
@@ -32,41 +25,6 @@ const SavingsGoals = () => {
     }
   };
 
-  /* =========================
-     Crear meta
-  ========================= */
-  const handleCreate = async (e) => {
-    e.preventDefault();
-
-    try {
-      await api.post("/metas", {
-        nombre: newGoal.nombre,
-        monto_objetivo: Number(newGoal.monto_objetivo),
-      });
-
-      setNewGoal({ nombre: "", monto_objetivo: "" });
-      setShowForm(false);
-      loadGoals();
-    } catch (error) {
-      console.error("❌ Error creando meta:", error);
-      alert("No se pudo crear la meta");
-    }
-  };
-
-  /* =========================
-     Eliminar meta
-  ========================= */
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Eliminar esta meta?")) return;
-
-    try {
-      await api.delete(`/metas/${id}`);
-      loadGoals();
-    } catch (error) {
-      console.error("❌ Error eliminando meta:", error);
-    }
-  };
-
   const progress = (actual, objetivo) => {
     if (!objetivo) return 0;
     return Math.min((actual / objetivo) * 100, 100);
@@ -75,104 +33,79 @@ const SavingsGoals = () => {
   return (
     <div className="dashboard-section h-full flex flex-col">
       {/* Header */}
-      <div className="savings-header">
-        <h3 className="savings-title-header">
-          <Trophy size={18} />
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy size={18} className="text-neon-purple" />
+        <h3 className="text-lg font-semibold text-white">
           Metas de Ahorro
         </h3>
-
-        <button
-          className="savings-add-btn"
-          onClick={() => setShowForm(!showForm)}
-          title="Nueva meta"
-        >
-          <Plus size={18} />
-        </button>
       </div>
 
-      {/* Formulario */}
-      {showForm && (
-        <form className="savings-form" onSubmit={handleCreate}>
-          <input
-            type="text"
-            placeholder="Nombre de la meta"
-            value={newGoal.nombre}
-            onChange={(e) =>
-              setNewGoal({ ...newGoal, nombre: e.target.value })
-            }
-            required
-          />
-
-          <input
-            type="number"
-            placeholder="Monto objetivo"
-            value={newGoal.monto_objetivo}
-            onChange={(e) =>
-              setNewGoal({
-                ...newGoal,
-                monto_objetivo: e.target.value,
-              })
-            }
-            required
-          />
-
-          <div className="savings-form-actions">
-            <button type="submit">Crear</button>
-            <button type="button" onClick={() => setShowForm(false)}>
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
-
       {/* Contenido */}
-      <div className="savings-container">
+      <div className="flex-1">
         {loading ? (
           <p className="expenses-empty">Cargando metas...</p>
         ) : goals.length === 0 ? (
-          <div className="savings-empty">
-            <Target size={32} />
-            <p>No tienes metas activas</p>
+          <div className="flex flex-col items-center justify-center h-full text-center gap-4 text-gray-400">
+            <div className="p-4 rounded-full bg-neon-purple/10">
+              <Target size={32} className="text-neon-purple" />
+            </div>
+
+            <p className="text-lg font-medium text-white">
+              No tienes metas activas
+            </p>
+
+            <p className="text-sm max-w-xs">
+              Crea y gestiona tus metas desde{" "}
+              <span className="text-neon-green font-medium">
+                SmartBot en Telegram
+              </span>{" "}
+              y aquí podrás ver tu progreso.
+            </p>
+
+            <a
+              href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 px-5 py-2 rounded-full bg-neon-green/10 border border-neon-green/30 text-neon-green hover:bg-neon-green/20 transition"
+            >
+              Ir a Telegram →
+            </a>
           </div>
         ) : (
-          goals.map((goal) => {
-            const pct = progress(
-              Number(goal.monto_actual || 0),
-              Number(goal.monto_objetivo)
-            );
+          <div className="space-y-4">
+            {goals.map((goal) => {
+              const pct = progress(
+                Number(goal.monto_actual || 0),
+                Number(goal.monto_objetivo)
+              );
 
-            return (
-              <div className="savings-card" key={goal.id_meta}>
-                <div className="savings-card-header">
-                  <div>
-                    <p className="savings-title">{goal.nombre}</p>
-                    <p className="savings-amount">
+              return (
+                <div
+                  className="p-4 rounded-xl bg-white/5 border border-white/10"
+                  key={goal.id_meta}
+                >
+                  <div className="flex justify-between mb-2">
+                    <p className="font-medium text-white">{goal.nombre}</p>
+                    <p className="text-sm text-gray-400">
                       ${Number(goal.monto_actual || 0).toLocaleString()} / $
                       {Number(goal.monto_objetivo).toLocaleString()}
                     </p>
                   </div>
 
-                  <button
-                    className="savings-delete"
-                    onClick={() => handleDelete(goal.id_meta)}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-neon-purple transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
 
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${pct}%` }}
-                  />
+                  <p className="text-xs text-gray-400 mt-2">
+                    {pct.toFixed(0)}% completado
+                  </p>
                 </div>
-
-                <p className="savings-progress-text">
-                  {pct.toFixed(0)}% completado
-                </p>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
