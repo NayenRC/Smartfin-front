@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-// 🔹 FUNCIÓN EXISTENTE QUE YA USA Chat.jsx
+// 🔹 Usado por Chat.jsx
 export async function sendMessageToBot(message) {
   const token = localStorage.getItem("token");
 
@@ -17,10 +17,15 @@ export async function sendMessageToBot(message) {
     throw new Error("Error enviando mensaje al bot");
   }
 
-  return res.json();
+  const data = await res.json();
+
+  // 🔑 Normalizamos la respuesta
+  return {
+    response: data.response || data.reply || "",
+  };
 }
 
-// 🔹 FUNCIÓN NUEVA PARA EL DASHBOARD
+// 🔹 Usado por Dashboard
 export async function getChatHistory() {
   const token = localStorage.getItem("token");
 
