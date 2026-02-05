@@ -251,18 +251,41 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Metas y Recent Activity */}
+      {/* Metas y Actividad */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 min-h-[400px]">
           <Suspense fallback={<ChartSkeleton />}>
             <SavingsGoals />
           </Suspense>
+          <div className="dashboard-section flex flex-col items-center justify-center text-center gap-4 min-h-[400px]">
+            <div className="p-4 rounded-full bg-neon-purple/10">
+              <Trophy className="w-10 h-10 text-neon-purple" />
+            </div>
+
+            <p className="text-lg font-semibold text-white">
+              Aún no tienes metas de ahorro
+            </p>
+
+            <p className="text-sm text-gray-500 max-w-xs">
+              Crear metas te ayuda a mantener el foco y ver tu progreso mes a mes.
+            </p>
+
+            <button className="mt-2 px-6 py-2 rounded-full bg-neon-purple/10 border border-neon-purple/30 text-neon-purple hover:bg-neon-purple/20 transition">
+              Crear primera meta
+            </button>
+          </div>
+
         </div>
 
         <div className="lg:col-span-2 min-h-[400px] dashboard-section">
-          <h3 className="text-lg font-semibold text-gray-200 mb-6">Actividad Reciente</h3>
+          <h3 className="text-lg font-semibold text-gray-200 mb-1">
+            Actividad Reciente
+          </h3>
+          <p className="text-xs text-gray-500 mb-4">
+            Movimientos registrados desde SmartBot o la app
+          </p>
           {recentTransactions.length > 0 ? (
-            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
               {recentTransactions.map((tx, idx) => (
                 <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
                   <div className="flex items-center gap-4">
@@ -293,39 +316,19 @@ const Dashboard = () => {
               <p className="text-xs">¡Empieza a hablar con el bot para ver tus datos aquí!</p>
             </div>
           )}
-          {recentTransactions.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-4 p-6 text-center">
-              <DollarSign className="w-12 h-12 opacity-20" />
-
-              <p className="text-lg font-medium">
-                Aún no hay movimientos registrados
-              </p>
-
-              <p className="text-sm text-gray-500 max-w-md">
-                Si estás usando <b>SmartBot en Telegram</b>, recuerda que debes
-                <b className="text-neon-green"> vincular tu cuenta</b> para que tus
-                métricas aparezcan aquí.
-              </p>
-
-              <a
-                href={`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_USERNAME}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 px-5 py-2 rounded-full bg-neon-green/10 border border-neon-green/30 text-neon-green hover:bg-neon-green/20 transition"
-              >
-                Ir a Telegram y vincular →
-              </a>
-            </div>
-          )}
-          {/* Chat con el bot */}
-          <div className="grid grid-cols-1 mt-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <ChatPanel />
-            </Suspense>
-          </div>
-
         </div>
       </div>
+      {/* 💬 CHAT CON SMARTBOT */}
+      <div className="dashboard-section mt-8">
+        <h3 className="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+          💬 Conversación con SmartBot
+        </h3>
+
+        <Suspense fallback={<ChartSkeleton />}>
+          <ChatPanel />
+        </Suspense>
+      </div>
+
     </div>
   );
 };
